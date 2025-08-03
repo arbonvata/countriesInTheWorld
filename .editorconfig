@@ -1,0 +1,29 @@
+
+    # Top-most EditorConfig file
+    root = true
+
+    # Apply to all Kotlin files
+    [*.{kt,kts}]
+    indent_size = 4
+    # ... other general rules you might have ...
+
+    # For Ktlint standard ruleset:
+    # Allow PascalCase for @Composable functions by disabling the rule for them
+    # or by specifically allowing it if the rule supports it.
+    # The exact property might depend on the Ktlint version and ruleset used.
+
+    # Option 1: Disable the 'function-naming' rule entirely (less ideal if you want it for non-Composables)
+    # This is a broader stroke and might not be what you want if you still want to enforce
+    # camelCase for regular (non-Composable) functions.
+    # Check the specific rule ID from ktlint output if it's different.
+    # ktlint_standard_function-naming = disabled
+
+    # Option 2 (Preferred for Ktlint 0.47+ and the standard ruleset):
+    # Use 'ktlint_function_naming_ignore_when_annotated_with'
+    # This tells the 'function-naming' rule to ignore functions annotated with @Composable.
+    ktlint_standard_function-naming-ignore-when-annotated-with = Composable
+
+    # If you are using a different ruleset (e.g., a custom one), the property might differ.
+    # Always refer to the documentation of the specific Ktlint ruleset you are using.
+    ktlint_function_naming_ignore_when_annotated_with = Composable
+
