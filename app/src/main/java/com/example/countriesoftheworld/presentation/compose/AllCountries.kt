@@ -1,11 +1,14 @@
-package com.example.countriesoftheworld.compose
+package com.example.countriesoftheworld.presentation.compose
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
@@ -28,6 +31,27 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.data.model.Country
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
+
+@Composable
+fun AllCountries(
+    modifier: Modifier,
+    countries: List<Country>,
+    onCheckedChange: (Boolean) -> Unit = {},
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        items(items = countries) { country ->
+            CountryWithFlag(
+                country = country,
+                modifier = Modifier.padding(8.dp),
+                onCheckedChange = onCheckedChange,
+            )
+        }
+    }
+}
 
 @Composable
 fun CountryWithFlag(
@@ -59,15 +83,14 @@ fun CountryWithFlag(
         CountryOptionsMenu(
             expanded = expanded,
             checked = checked,
-            onExpandedChange = {expanded = it},
+            onExpandedChange = { expanded = it },
             onCheckedChange = { newState ->
                 checked = newState
                 onCheckedChange(checked)
-            }
+            },
         )
     }
-
-    }
+}
 
 @Composable
 fun CountryOptionsMenu(
@@ -80,13 +103,13 @@ fun CountryOptionsMenu(
         IconButton(onClick = { onExpandedChange(true) }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = "More options"
+                contentDescription = "More options",
             )
         }
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) }
+            onDismissRequest = { onExpandedChange(false) },
         ) {
             DropdownMenuItem(
                 text = {
@@ -97,21 +120,52 @@ fun CountryOptionsMenu(
                                 onCheckedChange(newState)
                                 onExpandedChange(false) // Close menu after selection
                             },
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
                         )
                         Text(text = "Select Country")
                     }
                 },
-                onClick = { /* Handled by Checkbox */ }
+                onClick = { /* Handled by Checkbox */ },
             )
         }
     }
 }
 
 @Composable
-@Preview
+@Preview(showBackground = true, name = "Country with flag")
 fun CountryWithFlagPreview() {
     CountriesOfTheWorldTheme {
         CountryWithFlag(country = Country("United States", "https://flagcdn.com/w320/us.png"), modifier = Modifier.padding(8.dp))
+    }
+}
+
+@Preview(showBackground = true, name = "All countries")
+@Composable
+fun AllCountriesPreview() {
+    val sampleCountries =
+        listOf(
+            Country(name = "United States", flagUrl = "https://flagcdn.com/w320/us.png"),
+            Country(name = "Canada", flagUrl = "https://flagcdn.com/w320/ca.png"),
+            Country(name = "Mexico", flagUrl = "https://flagcdn.com/w320/mx.png"),
+            Country(name = "Brazil", flagUrl = "https://flagcdn.com/w320/br.png"),
+            Country(name = "Argentina", flagUrl = "https://flagcdn.com/w320/ar.png"),
+            Country(name = "United Kingdom", flagUrl = "https://flagcdn.com/w320/gb.png"),
+            Country(name = "Germany", flagUrl = "https://flagcdn.com/w320/de.png"),
+            Country(name = "France", flagUrl = "https://flagcdn.com/w320/fr.png"),
+            Country(name = "Spain", flagUrl = "https://flagcdn.com/w320/es.png"),
+            Country(name = "Italy", flagUrl = "https://flagcdn.com/w320/it.png"),
+            Country(name = "Japan", flagUrl = "https://flagcdn.com/w320/jp.png"),
+            Country(name = "China", flagUrl = "https://flagcdn.com/w320/cn.png"),
+            Country(name = "India", flagUrl = "https://flagcdn.com/w320/in.png"),
+            Country(name = "Australia", flagUrl = "https://flagcdn.com/w320/au.png"),
+            Country(name = "New Zealand", flagUrl = "https://flagcdn.com/w320/nz.png"),
+            Country(name = "South Africa", flagUrl = "https://flagcdn.com/w320/za.png"),
+            Country(name = "Egypt", flagUrl = "https://flagcdn.com/w320/eg.png"),
+            Country(name = "Nigeria", flagUrl = "https://flagcdn.com/w320/ng.png"),
+            Country(name = "Kenya", flagUrl = "https://flagcdn.com/w320/ke.png"),
+            Country(name = "Russia", flagUrl = "https://flagcdn.com/w320/ru.png"),
+        )
+    CountriesOfTheWorldTheme {
+        AllCountries(modifier = Modifier, countries = sampleCountries)
     }
 }

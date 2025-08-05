@@ -1,4 +1,4 @@
-package com.example.countriesoftheworld.compose
+package com.example.countriesoftheworld.presentation.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
