@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("org.jlleitschuh.gradle.ktlint")
 }
 
@@ -43,16 +44,22 @@ android {
 dependencies {
 
     implementation(libs.slf4j.android)
-
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.ktor.client.serialization)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+
     implementation(libs.slf4j.android)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
+    implementation(libs.coil.svg)
+
+
     implementation(libs.coil.compose)
-    implementation(libs.coil3.coil.network.okhttp)
+    // works only with "io.coil-kt.coil3:coil-network-ktor not
+    // io.coil-kt.coil3:coil-network-okhttp:3.2.0
+    implementation(libs.coil3.coil.network)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

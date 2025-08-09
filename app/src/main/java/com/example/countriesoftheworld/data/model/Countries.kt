@@ -1,71 +1,128 @@
 package com.example.countriesoftheworld.data.model
 
-class Countries : ArrayList<CountriesItem>()
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CountriesItem(
-    val alpha2Code: String,
-    val alpha3Code: String,
-    val altSpellings: List<String>,
-    val area: Double,
-    val borders: List<String>,
-    val callingCodes: List<String>,
-    val capital: String,
-    val cioc: String,
-    val currencies: List<Currency>,
-    val demonym: String,
-    val flag: String,
-    val flags: Flags,
-    val gini: Double,
-    val independent: Boolean,
-    val languages: List<Language>,
-    val latlng: List<Double>,
-    val name: String,
-    val nativeName: String,
-    val numericCode: String,
-    val population: Int,
-    val region: String,
-    val regionalBlocs: List<RegionalBloc>,
-    val subregion: String,
-    val timezones: List<String>,
-    val topLevelDomain: List<String>,
-    val translations: Translations,
+    @SerialName("alpha2Code")
+    val alpha2Code: String? = null,
+    @SerialName("alpha3Code")
+    val alpha3Code: String? = null,
+    @SerialName("al?Spellings")
+    val altSpellings: List<String>? = null,
+    @SerialName("area")
+    val area: Double? = null,
+    @SerialName("borders")
+    val borders: List<String>? = null,
+    @SerialName("callingCodes")
+    val callingCodes: List<String>? = null,
+    @SerialName("capital")
+    val capital: String? = null,
+    @SerialName("cioc")
+    val cioc: String? = null,
+    @SerialName("currencies")
+    val currencies: List<Currency>? = null,
+    @SerialName("demonym")
+    val demonym: String? = null,
+    @SerialName("flag")
+    val flag: String? = null,
+    @SerialName("flags")
+    val flags: Flags? = null,
+    @SerialName("gini")
+    val gini: Double? = null,
+    @SerialName("independent")
+    val independent: Boolean?,
+    @SerialName("languages")
+    val languages: List<Language>?,
+    @SerialName("latlng")
+    val latlng: List<Double>?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("nativeName")
+    val nativeName: String?,
+    @SerialName("numericCode")
+    val numericCode: String?,
+    @SerialName("population")
+    val population: Int?,
+    @SerialName("region")
+    val region: String?,
+    @SerialName("regionalBlocs")
+    val regionalBlocs: List<RegionalBloc>?,
+    @SerialName("subregion")
+    val subregion: String?,
+    @SerialName("timezones")
+    val timezones: List<String>?,
+    @SerialName("topLevelDomain")
+    val topLevelDomain: List<String>?,
+    @SerialName("translations")
+    val translations: Translations?,
 )
 
+@Serializable
 data class Currency(
-    val code: String,
-    val name: String,
-    val symbol: String,
+    @SerialName("code")
+    val code: String?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("symbol")
+    val symbol: String?,
 )
 
+@Serializable
 data class Flags(
-    val png: String,
-    val svg: String,
+    @SerialName("png")
+    val png: String?,
+    @SerialName("svg")
+    val svg: String?,
 )
 
+@Serializable
 data class Language(
-    val iso639_1: String,
+    @SerialName("iso639_1")
+    val iso639_1: String?,
+    @SerialName("iso639_2")
     val iso639_2: String,
-    val name: String,
-    val nativeName: String,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("nativeName")
+    val nativeName: String?,
 )
 
+@Serializable
 data class RegionalBloc(
-    val acronym: String,
-    val name: String,
-    val otherAcronyms: List<String>,
-    val otherNames: List<String>,
+    @SerialName("acronym")
+    val acronym: String?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("otherAcronyms")
+    val otherAcronyms: List<String?>?,
+    @SerialName("otherNames")
+    val otherNames: List<String?>?,
 )
 
+@Serializable
 data class Translations(
-    val br: String,
-    val de: String,
-    val es: String,
-    val fa: String,
-    val fr: String,
-    val hr: String,
-    val hu: String,
-    val `it`: String,
-    val ja: String,
-    val nl: String,
-    val pt: String,
+    @SerialName("br")
+    val br: String?,
+    @SerialName("de")
+    val de: String?,
+    @SerialName("es")
+    val es: String?,
+    @SerialName("fa")
+    val fa: String?,
+    @SerialName("fr")
+    val fr: String?,
+    @SerialName("hr")
+    val hr: String?,
+    @SerialName("hu")
+    val hu: String?,
+    @SerialName("it")
+    val `it`: String?,
+    @SerialName("ja")
+    val ja: String?,
+    @SerialName("nl")
+    val nl: String?,
+    @SerialName("pt")
+    val pt: String?,
 )

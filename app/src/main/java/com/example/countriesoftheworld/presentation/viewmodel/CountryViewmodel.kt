@@ -1,22 +1,22 @@
 package com.example.countriesoftheworld.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesoftheworld.data.model.Countries
+import com.example.countriesoftheworld.data.model.CountriesItem
 import com.example.countriesoftheworld.data.model.Country
 import com.example.countriesoftheworld.data.repository.AllCountriesRepository
-import io.ktor.client.plugins.ClientRequestException // Ktor exception for 404
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// UI State sealed interfaces remain the same
 sealed interface AllCountriesUiState {
     object Loading : AllCountriesUiState
 
     data class Success(
-        val countries: Countries,
+        val countries: List<CountriesItem>,
     ) : AllCountriesUiState
 
     data class Error(
@@ -38,18 +38,13 @@ sealed interface SingleCountryUiState {
     object NotFound : SingleCountryUiState
 }
 
-class CountryViewModel(
-    private val countriesRepository: AllCountriesRepository,
-) : ViewModel() {
+class CountryViewModel : ViewModel() {
+    private val countriesRepository: AllCountriesRepository = AllCountriesRepository()
     private val _allCountriesState = MutableStateFlow<AllCountriesUiState>(AllCountriesUiState.Loading)
     val allCountriesState: StateFlow<AllCountriesUiState> = _allCountriesState.asStateFlow()
 
     private val _singleCountryState = MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
     val singleCountryState: StateFlow<SingleCountryUiState> = _singleCountryState.asStateFlow()
-
-    init {
-        fetchAllCountries()
-    }
 
     fun fetchAllCountries() {
         viewModelScope.launch {
@@ -58,8 +53,10 @@ class CountryViewModel(
                 // Use runCatching to get a kotlin.Result
                 countriesRepository.getAllCountries()
             }.onSuccess { countries ->
-                _allCountriesState.value = AllCountriesUiState.Success(countries)
+                Log.d("ArbonVata", "onSuccess: $countries")
+                _allCountriesState.value = AllCountriesUiState.Success(countries = countries)
             }.onFailure { throwable ->
+                Log.d("ArbonVata", "onError: ${throwable.message}")
                 _allCountriesState.value =
                     AllCountriesUiState.Error(
                         throwable.message ?: "Failed to load countries",

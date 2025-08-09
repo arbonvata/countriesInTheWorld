@@ -1,5 +1,6 @@
 package com.example.countriesoftheworld.presentation.compose
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,12 +31,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.data.model.Country
+import com.example.countriesoftheworld.presentation.viewmodel.AllCountriesUiState
+import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 
 @Composable
 fun AllCountries(
+    modifier: Modifier = Modifier,
+    countryViewModel: CountryViewModel = viewModel(),
+) {
+    val countries = countryViewModel.allCountriesState.collectAsState()
+    LaunchedEffect(Unit) {
+        Log.d("ArbonVata", "Fetching all countries")
+        countryViewModel.fetchAllCountries()
+    }
+    when (val state = countries.value) {
+        is AllCountriesUiState.Success -> {
+            val allCountries =
+                state.countries.map {
+                    Country(name = it.name!!, flagUrl = it.flag!!)
+                }
+
+            AllCountries(
+                modifier = modifier,
+                countries = allCountries,
+                onCheckedChange = {},
+            )
+        }
+        is AllCountriesUiState.Error -> {
+        }
+        is AllCountriesUiState.Loading -> {
+        }
+    }
+}
+
+@Composable
+private fun AllCountries(
     modifier: Modifier,
     countries: List<Country>,
     onCheckedChange: (Boolean) -> Unit = {},
@@ -44,6 +80,7 @@ fun AllCountries(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(items = countries) { country ->
+
             CountryWithFlag(
                 country = country,
                 modifier = Modifier.padding(8.dp),
@@ -72,6 +109,7 @@ fun CountryWithFlag(
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(44.dp).aspectRatio(1f),
         )
+
         Text(
             text = country.name,
             modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),

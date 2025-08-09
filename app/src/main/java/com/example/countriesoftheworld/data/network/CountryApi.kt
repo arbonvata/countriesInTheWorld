@@ -1,6 +1,6 @@
 package com.example.countriesoftheworld.data.network
 
-import com.example.countriesoftheworld.data.model.Countries
+import com.example.countriesoftheworld.data.model.CountriesItem
 import com.example.countriesoftheworld.data.model.Country
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -24,6 +24,8 @@ class CountryApi {
                     Json {
                         prettyPrint = true
                         isLenient = true
+                        ignoreUnknownKeys = true
+                        explicitNulls = false
                     },
                 )
             }
@@ -36,7 +38,7 @@ class CountryApi {
             }
         }
 
-    suspend fun getCountries(): Countries = client.get("countries").body<Countries>()
+    suspend fun getCountries(): List<CountriesItem> = client.get("countries").body<List<CountriesItem>>()
 
     suspend fun getCountry(name: String): Country = client.get(name).body<Country>()
 }
