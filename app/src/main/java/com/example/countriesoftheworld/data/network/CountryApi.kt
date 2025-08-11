@@ -1,7 +1,6 @@
 package com.example.countriesoftheworld.data.network
 
-import com.example.countriesoftheworld.data.model.CountriesItem
-import com.example.countriesoftheworld.data.model.Country
+import com.example.countriesoftheworld.data.model.CountryItem
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -12,6 +11,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
+import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -38,7 +38,15 @@ class CountryApi {
             }
         }
 
-    suspend fun getCountries(): List<CountriesItem> = client.get("countries").body<List<CountriesItem>>()
+    suspend fun getCountries(): List<CountryItem> = client.get("countries").body<List<CountryItem>>()
 
-    suspend fun getCountry(name: String): Country = client.get(name).body<Country>()
+    suspend fun getCountry(countryName: String): List<CountryItem> =
+        client
+            .get {
+                url {
+                    // The base URL is already set by defaultRequest
+                    // We append path segments here
+                    appendPathSegments("name", countryName)
+                }
+            }.body<List<CountryItem>>()
 }

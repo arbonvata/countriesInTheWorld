@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CountriesItem(
+data class CountryItem(
     @SerialName("alpha2Code")
     val alpha2Code: String? = null,
     @SerialName("alpha3Code")

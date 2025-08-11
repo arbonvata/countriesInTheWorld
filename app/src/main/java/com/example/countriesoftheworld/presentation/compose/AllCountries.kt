@@ -1,6 +1,7 @@
 package com.example.countriesoftheworld.presentation.compose
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.data.model.Country
 import com.example.countriesoftheworld.presentation.viewmodel.AllCountriesUiState
@@ -42,6 +44,7 @@ import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 fun AllCountries(
     modifier: Modifier = Modifier,
     countryViewModel: CountryViewModel = viewModel(),
+    navController: NavController? = null,
 ) {
     val countries = countryViewModel.allCountriesState.collectAsState()
     LaunchedEffect(Unit) {
@@ -59,6 +62,9 @@ fun AllCountries(
                 modifier = modifier,
                 countries = allCountries,
                 onCheckedChange = {},
+                onCountryClicked = { countryName ->
+                    navController?.navigate("countryInfo/$countryName")
+                },
             )
         }
         is AllCountriesUiState.Error -> {
@@ -73,6 +79,7 @@ private fun AllCountries(
     modifier: Modifier,
     countries: List<Country>,
     onCheckedChange: (Boolean) -> Unit = {},
+    onCountryClicked: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -85,6 +92,7 @@ private fun AllCountries(
                 country = country,
                 modifier = Modifier.padding(8.dp),
                 onCheckedChange = onCheckedChange,
+                onCountryClicked = onCountryClicked,
             )
         }
     }
@@ -95,12 +103,15 @@ fun CountryWithFlag(
     modifier: Modifier,
     country: Country,
     onCheckedChange: (Boolean) -> Unit = {},
+    onCountryClicked: (country: String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier,
+        modifier =
+            modifier
+                .clickable { onCountryClicked(country.name) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
@@ -173,7 +184,16 @@ fun CountryOptionsMenu(
 @Preview(showBackground = true, name = "Country with flag")
 fun CountryWithFlagPreview() {
     CountriesOfTheWorldTheme {
-        CountryWithFlag(country = Country("United States", "https://flagcdn.com/w320/us.png"), modifier = Modifier.padding(8.dp))
+        CountryWithFlag(
+            country =
+                Country(
+                    "United States",
+                    "https://flagcdn.com/w320/us.png",
+                ),
+            modifier = Modifier.padding(8.dp),
+            onCountryClicked = {
+            },
+        )
     }
 }
 
@@ -204,6 +224,6 @@ fun AllCountriesPreview() {
             Country(name = "Russia", flagUrl = "https://flagcdn.com/w320/ru.png"),
         )
     CountriesOfTheWorldTheme {
-        AllCountries(modifier = Modifier, countries = sampleCountries)
+        AllCountries(modifier = Modifier, countries = sampleCountries, onCheckedChange = {}, onCountryClicked = {})
     }
 }

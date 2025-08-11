@@ -1,5 +1,6 @@
 package com.example.countriesoftheworld.presentation.compose
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +26,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
+import com.example.countriesoftheworld.presentation.viewmodel.SingleCountryUiState
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
+
+const val TAG = "ArbonVata"
+
+@Composable
+fun CountryInfoScreen(
+    modifier: Modifier = Modifier,
+    countryName: String,
+    countryViewModel: CountryViewModel = viewModel(),
+    navController: NavController,
+) {
+    SideEffect {
+        Log.d(TAG, "Entered CountryInfoScreen for country: $countryName")
+    }
+    val country = countryViewModel.singleCountryState.collectAsState()
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "LaunchedEffect: Fetching country details for $countryName")
+
+        countryViewModel.fetchCountryByName(countryName)
+    }
+    val countryState = country
+    Column {
+        when (countryState.value) {
+            is SingleCountryUiState.Success ->
+                {
+                    val countryState = countryState.value as SingleCountryUiState.Success
+                    CountryView(title = "Country", info = countryState.country.name!!)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CountryView(title = "Capital", info = countryState.country.capital!!)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            is SingleCountryUiState.Error -> {
+                val countryState = countryState.value as SingleCountryUiState.Error
+                Log.e(TAG, "Error fetching country details: ${countryState.message}")
+            }
+            is SingleCountryUiState.Loading -> {
+                val countryState = countryState.value as SingleCountryUiState.Loading
+                Log.d(TAG, "Loading country details...")
+            }
+
+            SingleCountryUiState.NotFound -> {
+                Log.d(TAG, "Country not found")
+            }
+        }
+    }
+}
 
 @Composable
 fun CountryView(
@@ -82,18 +135,21 @@ fun CountryInfoWithList(
 @Composable
 fun CountryVisitedByMe(
     modifier: Modifier = Modifier,
-    initialCheckedState: Boolean,
-    onCheckedChange: () -> Unit,
+    initialCheckedState: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
-    var checked by remember { mutableStateOf(false) }
+    // Use remember and mutableStateOf to hold the state of the Switch
+    var isChecked by remember { mutableStateOf(initialCheckedState) }
+
     Row(
         modifier = Modifier.padding(start = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Switch(
-            checked = checked,
-            onCheckedChange = {
-                checked = it
+            checked = isChecked,
+            onCheckedChange = { newCheckedState ->
+                isChecked = newCheckedState
+                onCheckedChange(newCheckedState)
             },
         )
         Spacer(modifier = Modifier.width(14.dp))
@@ -134,7 +190,11 @@ fun CountryVisitedByMeCheckedPreview() {
 fun CountryInfoWithListLanguagesPreview() {
     CountriesOfTheWorldTheme {
         CountryInfoWithList(
-            modifier = Modifier.fillMaxWidth().height(200.dp), // Provide some constraints for preview
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+            // Provide some constraints for preview
             title = "Languages",
             info = listOf("English", "Spanish", "French"),
         )
@@ -146,7 +206,11 @@ fun CountryInfoWithListLanguagesPreview() {
 fun CountryInfoWithListEmptyPreview() {
     CountriesOfTheWorldTheme {
         CountryInfoWithList(
-            modifier = Modifier.fillMaxWidth().height(100.dp), // Provide some constraints
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+            // Provide some constraints
             title = "Borders",
             info = emptyList(), // Test how it looks with no items
         )

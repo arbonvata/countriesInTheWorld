@@ -3,8 +3,7 @@ package com.example.countriesoftheworld.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesoftheworld.data.model.CountriesItem
-import com.example.countriesoftheworld.data.model.Country
+import com.example.countriesoftheworld.data.model.CountryItem
 import com.example.countriesoftheworld.data.repository.AllCountriesRepository
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,7 @@ sealed interface AllCountriesUiState {
     object Loading : AllCountriesUiState
 
     data class Success(
-        val countries: List<CountriesItem>,
+        val countries: List<CountryItem>,
     ) : AllCountriesUiState
 
     data class Error(
@@ -28,7 +27,7 @@ sealed interface SingleCountryUiState {
     object Loading : SingleCountryUiState
 
     data class Success(
-        val country: Country,
+        val country: CountryItem,
     ) : SingleCountryUiState
 
     data class Error(
@@ -71,7 +70,7 @@ class CountryViewModel : ViewModel() {
             runCatching {
                 countriesRepository.getCountry(name)
             }.onSuccess { country ->
-                _singleCountryState.value = SingleCountryUiState.Success(country)
+                _singleCountryState.value = SingleCountryUiState.Success(country[0])
             }.onFailure { throwable ->
                 if (throwable is ClientRequestException && throwable.response.status.value == 404) {
                     _singleCountryState.value = SingleCountryUiState.NotFound
