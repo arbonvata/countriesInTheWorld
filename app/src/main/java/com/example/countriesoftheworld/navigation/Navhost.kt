@@ -47,8 +47,5 @@ fun AppNavigation() {
                 // Example: navController.popBackStack()
             }
         }
-
-        // You can add more destinations here
-        // composable(route = "anotherScreen") { AnotherScreen(navController) }
     }
 }
