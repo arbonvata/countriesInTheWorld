@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 android {
@@ -85,4 +86,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+detekt {
+    // Other Detekt configurations
+    config.setFrom(files("$rootDir/config/detekt-config.yml"))
 }
