@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
@@ -42,7 +42,7 @@ const val TAG = "CountryInfoScreen"
 fun CountryInfoScreen(
     modifier: Modifier = Modifier,
     countryName: String,
-    countryViewModel: CountryViewModel = viewModel(),
+    countryViewModel: CountryViewModel = hiltViewModel(),
     navController: NavController,
 ) {
     SideEffect {
