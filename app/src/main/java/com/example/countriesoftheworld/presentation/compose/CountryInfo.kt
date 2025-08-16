@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -37,7 +36,7 @@ import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
 import com.example.countriesoftheworld.presentation.viewmodel.SingleCountryUiState
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 
-const val TAG = "ArbonVata"
+const val TAG = "CountryInfoScreen"
 
 @Composable
 fun CountryInfoScreen(
@@ -59,52 +58,67 @@ fun CountryInfoScreen(
     val countryState = country
     // Todo: Fix scrolling
     Column(
-        modifier = modifier.fillMaxWidth(), // .verticalScroll(scrollState),
+        modifier = modifier.fillMaxWidth().verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when (countryState.value) {
-            is SingleCountryUiState.Success ->
-                {
-                    val countryState = countryState.value as SingleCountryUiState.Success
-                    CountryView(title = "Country", info = countryState.country.name!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(title = "Capital", info = countryState.country.capital!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(
-                        title = "Currencies",
-                        info =
-                            countryState.country.currencies!!
-                                .map { it -> it.name }
-                                .joinToString(separator = " "),
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+            is SingleCountryUiState.Success -> {
+                val countryState = countryState.value as SingleCountryUiState.Success
+                val country = countryState.country
 
-                    CountryInfoWithList(modifier = modifier.fillMaxWidth(), title = "Borders ", info = countryState.country.borders!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryInfoWithList(
-                        modifier = modifier.fillMaxWidth(),
-                        title = "Languages",
-                        info =
-                            countryState.country.languages!!
-                                .map { it -> it.name!! },
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Country", info = country.name ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Capital", info = country.capital ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    CountryView(title = "Calling code", info = countryState.country.callingCodes!![0])
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(title = "Region", info = countryState.country.region!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(title = "Sub region", info = countryState.country.subregion!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(title = "Population", info = countryState.country.population.toString())
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CountryView(title = "Area", info = countryState.country.area.toString())
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextWithFlag(modifier = modifier, countryName = countryState.country.name!!, flagUrl = countryState.country.flag!!)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextWithFlag(modifier = modifier, countryName = countryState.country.name!!, flagUrl = countryState.country.flag!!)
-                }
+                val currenciesInfo =
+                    country.currencies
+                        ?.mapNotNull { it.name }
+                        ?.joinToString(separator = " ")
+                        ?: "N/A"
+                CountryView(title = "Currencies", info = currenciesInfo)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                CountryInfoWithList(
+                    modifier = modifier.fillMaxWidth(),
+                    title = "Borders",
+                    info = country.borders ?: emptyList(),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val languagesInfo =
+                    country.languages
+                        ?.mapNotNull { it.name }
+                        ?: emptyList()
+                CountryInfoWithList(
+                    modifier = modifier.fillMaxWidth(),
+                    title = "Languages",
+                    info = languagesInfo,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val callingCode =
+                    country.callingCodes
+                        ?.firstOrNull()
+                        ?: "N/A"
+                CountryView(title = "Calling code", info = callingCode)
+                Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Region", info = country.region ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Sub region", info = country.subregion ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Population", info = country.population?.toString() ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
+                CountryView(title = "Area", info = country.area?.toString() ?: "N/A")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextWithFlag(
+                    modifier = modifier,
+                    countryName = country.name ?: "Unknown",
+                    flagUrl = country.flag ?: "",
+                )
+            }
             is SingleCountryUiState.Error -> {
                 val countryState = countryState.value as SingleCountryUiState.Error
                 Log.e(TAG, "Error fetching country details: ${countryState.message}")
@@ -149,30 +163,26 @@ fun CountryView(
 
 @Composable
 fun CountryInfoWithList(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     title: String,
     info: List<String>,
 ) {
     if (info.isEmpty()) {
         return
     }
-    LazyColumn(
+    Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        item {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-            )
-        }
-        item {
-            Spacer(modifier = Modifier.height(6.dp))
-        }
-
-        items(items = info) { item ->
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        // to avoid nested scrolling
+        info.forEach { item ->
             Text(
                 text = item,
                 style = MaterialTheme.typography.bodyMedium,
