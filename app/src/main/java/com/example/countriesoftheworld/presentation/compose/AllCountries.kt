@@ -67,8 +67,10 @@ fun AllCountries(
                 },
             )
         }
+
         is AllCountriesUiState.Error -> {
         }
+
         is AllCountriesUiState.Loading -> {
         }
     }
@@ -118,7 +120,10 @@ fun CountryWithFlag(
             model = country.flagUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(44.dp).aspectRatio(1f),
+            modifier =
+                Modifier
+                    .size(44.dp)
+                    .aspectRatio(1f),
         )
 
         Text(
@@ -224,6 +229,11 @@ fun AllCountriesPreview() {
             Country(name = "Russia", flagUrl = "https://flagcdn.com/w320/ru.png"),
         )
     CountriesOfTheWorldTheme {
-        AllCountries(modifier = Modifier, countries = sampleCountries, onCheckedChange = {}, onCountryClicked = {})
+        AllCountries(
+            modifier = Modifier,
+            countries = sampleCountries,
+            onCheckedChange = {},
+            onCountryClicked = {},
+        )
     }
 }

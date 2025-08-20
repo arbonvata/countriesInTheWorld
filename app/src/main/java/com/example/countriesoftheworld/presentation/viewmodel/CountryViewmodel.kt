@@ -46,10 +46,12 @@ class CountryViewModel
         // Constructor injection
         private val countriesRepository: AllCountriesRepository,
     ) : ViewModel() {
-        private val _allCountriesState = MutableStateFlow<AllCountriesUiState>(AllCountriesUiState.Loading)
+        private val _allCountriesState =
+            MutableStateFlow<AllCountriesUiState>(AllCountriesUiState.Loading)
         val allCountriesState: StateFlow<AllCountriesUiState> = _allCountriesState.asStateFlow()
 
-        private val _singleCountryState = MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
+        private val _singleCountryState =
+            MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
         val singleCountryState: StateFlow<SingleCountryUiState> = _singleCountryState.asStateFlow()
 
         fun fetchAllCountries() {

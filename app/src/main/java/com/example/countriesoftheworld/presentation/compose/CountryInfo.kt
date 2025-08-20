@@ -58,7 +58,10 @@ fun CountryInfoScreen(
     val countryState = country
     // Todo: Fix scrolling
     Column(
-        modifier = modifier.fillMaxWidth().verticalScroll(scrollState),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -119,10 +122,12 @@ fun CountryInfoScreen(
                     flagUrl = country.flag ?: "",
                 )
             }
+
             is SingleCountryUiState.Error -> {
                 val countryState = countryState.value as SingleCountryUiState.Error
                 Log.e(TAG, "Error fetching country details: ${countryState.message}")
             }
+
             is SingleCountryUiState.Loading -> {
                 val countryState = countryState.value as SingleCountryUiState.Loading
                 Log.d(TAG, "Loading country details...")
@@ -149,7 +154,8 @@ fun CountryView(
         Text(
             text = title,
             style =
-                MaterialTheme.typography.titleLarge.copy( // Copy existing style to modify it
+                MaterialTheme.typography.titleLarge.copy(
+                    // Copy existing style to modify it
                     fontWeight = FontWeight.Bold, // Make the text bold
                 ),
             textAlign = TextAlign.Center,
