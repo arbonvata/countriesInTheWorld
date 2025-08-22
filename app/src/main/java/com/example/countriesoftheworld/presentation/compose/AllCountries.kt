@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,10 +18,13 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +46,7 @@ import com.example.countriesoftheworld.presentation.viewmodel.AllCountriesUiStat
 import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCountries(
     modifier: Modifier = Modifier,
@@ -51,33 +58,77 @@ fun AllCountries(
         Log.d("ArbonVata", "Fetching all countries")
         countryViewModel.fetchAllCountries()
     }
-    when (val state = countries.value) {
-        is AllCountriesUiState.Success -> {
-            val allCountries =
-                state.countries.map {
-                    Country(name = it.name!!, flagUrl = it.flag!!)
+
+    Scaffold(
+        topBar = {
+            AllCountriesTopAppBar()
+        },
+    ) { innerPadding ->
+        when (val state = countries.value) {
+            is AllCountriesUiState.Success -> {
+                val allCountries =
+                    state.countries.map {
+                        Country(name = it.name!!, flagUrl = it.flag!!)
+                    }
+
+                AllCountriesList(
+                    modifier = modifier.padding(innerPadding),
+                    countries = allCountries,
+                    onCheckedChange = {},
+                    onCountryClicked = { countryName ->
+                        navController?.navigate("countryInfo/$countryName")
+                    },
+                )
+            }
+
+            is AllCountriesUiState.Error -> {
+                // Show error message to user
+                Box(
+                    modifier =
+                        modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Error loading countries",
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
+            }
 
-            AllCountries(
-                modifier = modifier,
-                countries = allCountries,
-                onCheckedChange = {},
-                onCountryClicked = { countryName ->
-                    navController?.navigate("countryInfo/$countryName")
-                },
-            )
-        }
-
-        is AllCountriesUiState.Error -> {
-        }
-
-        is AllCountriesUiState.Loading -> {
+            is AllCountriesUiState.Loading -> {
+                // Show loading indicator
+                Box(
+                    modifier =
+                        modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator()
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AllCountries(
+fun AllCountriesTopAppBar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = "All Countries",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+            )
+        },
+    )
+}
+
+@Composable
+private fun AllCountriesList(
     modifier: Modifier,
     countries: List<Country>,
     onCheckedChange: (Boolean) -> Unit = {},
@@ -229,7 +280,7 @@ fun AllCountriesPreview() {
             Country(name = "Russia", flagUrl = "https://flagcdn.com/w320/ru.png"),
         )
     CountriesOfTheWorldTheme {
-        AllCountries(
+        AllCountriesList(
             modifier = Modifier,
             countries = sampleCountries,
             onCheckedChange = {},
