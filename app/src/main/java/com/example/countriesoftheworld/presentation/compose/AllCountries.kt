@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -67,8 +68,12 @@ fun AllCountries(
         when (val state = countries.value) {
             is AllCountriesUiState.Success -> {
                 val allCountries =
-                    state.countries.map {
-                        Country(name = it.name!!, flagUrl = it.flag!!)
+                    state.countries.mapNotNull { countryItem ->
+                        countryItem.name?.let { name ->
+                            countryItem.flag?.let { flag ->
+                                Country(name = name, flagUrl = flag)
+                            }
+                        }
                     }
 
                 AllCountriesList(
@@ -82,7 +87,7 @@ fun AllCountries(
             }
 
             is AllCountriesUiState.Error -> {
-                // Show error message to user
+                // Show error message to user with retry option
                 Box(
                     modifier =
                         modifier
@@ -90,10 +95,21 @@ fun AllCountries(
                             .padding(innerPadding),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = "Error loading countries",
-                        color = MaterialTheme.colorScheme.error,
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = "Error loading countries. Please check your connection and try again.",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(bottom = 16.dp),
+                            textAlign = TextAlign.Center,
+                        )
+                        androidx.compose.material3.Button(
+                            onClick = { countryViewModel.fetchAllCountries() },
+                        ) {
+                            Text("Retry")
+                        }
+                    }
                 }
             }
 
@@ -169,7 +185,7 @@ fun CountryWithFlag(
     ) {
         AsyncImage(
             model = country.flagUrl,
-            contentDescription = null,
+            contentDescription = "Flag of ${country.name}",
             contentScale = ContentScale.Crop,
             modifier =
                 Modifier

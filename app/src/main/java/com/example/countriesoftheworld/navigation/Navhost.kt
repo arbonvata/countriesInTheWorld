@@ -1,7 +1,7 @@
 package com.example.countriesoftheworld.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,11 +40,15 @@ fun AppNavigation() {
             // Retrieve the argument
             val countryName = backStackEntry.arguments?.getString(AppDestinations.COUNTRY_INFO_ARG_NAME)
             if (countryName != null) {
-                CountryInfoScreen(countryName = countryName, navController = navController)
+                CountryInfoScreen(
+                    countryName = countryName,
+                    navController = navController,
+                )
             } else {
-                // Handle error: countryName not found, perhaps navigate back or show an error
-                Text("Error: Country name not provided.")
-                // Example: navController.popBackStack()
+                // Handle error: countryName not found, navigate back
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
             }
         }
     }

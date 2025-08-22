@@ -14,6 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,9 +62,9 @@ fun CountryInfoScreen(
     }
     val country = countryViewModel.singleCountryState.collectAsState()
     val scrollState = rememberScrollState()
-    LaunchedEffect(Unit) {
+    LaunchedEffect(countryName) {
         Log.d(TAG, "LaunchedEffect: Fetching country details for $countryName")
-
+        countryViewModel.clearSingleCountryState()
         countryViewModel.fetchCountryByName(countryName)
     }
     val countryState = country
@@ -95,17 +97,26 @@ fun CountryInfoScreen(
                 is SingleCountryUiState.Error -> {
                     val countryState = countryState.value as SingleCountryUiState.Error
                     Log.e(TAG, "Error fetching country details: ${countryState.message}")
-                    // Show error message to user
-                    Text(
-                        text = "Error loading country details: ${countryState.message}",
-                        color = MaterialTheme.colorScheme.error,
+                    // Show error message to user with retry option
+                    Column(
                         modifier = Modifier.padding(16.dp),
-                    )
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = "Error loading country details. Please check your connection and try again.",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(bottom = 16.dp),
+                            textAlign = TextAlign.Center,
+                        )
+                        Button(
+                            onClick = { countryViewModel.fetchCountryByName(countryName) },
+                        ) {
+                            Text("Retry")
+                        }
+                    }
                 }
 
                 is SingleCountryUiState.Loading -> {
-                    val countryState = countryState.value as SingleCountryUiState.Loading
-                    Log.d(TAG, "Loading country details...")
                     // Show loading indicator
                     CountryInfoLoadingIndicator()
                 }
@@ -153,7 +164,7 @@ fun CountryInfoLoadingIndicator() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        androidx.compose.material3.CircularProgressIndicator(
+        CircularProgressIndicator(
             modifier = Modifier.size(48.dp),
         )
         Spacer(modifier = Modifier.height(16.dp))
