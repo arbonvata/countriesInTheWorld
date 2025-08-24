@@ -8,8 +8,11 @@ import com.example.countriesoftheworld.data.repository.AllCountriesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,6 +57,28 @@ class CountryViewModel
             MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
         val singleCountryState: StateFlow<SingleCountryUiState> = _singleCountryState.asStateFlow()
 
+        private val _searchQuery = MutableStateFlow("")
+        val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+        val filteredCountriesState: StateFlow<AllCountriesUiState> =
+            allCountriesState
+                .combine(searchQuery) { state, query ->
+                    when (state) {
+                        is AllCountriesUiState.Success -> {
+                            val filteredCountries =
+                                state.countries.filter {
+                                    it.name?.contains(query, ignoreCase = true) == true
+                                }
+                            AllCountriesUiState.Success(filteredCountries)
+                        }
+                        else -> state
+                    }
+                }.stateIn(viewModelScope, SharingStarted.Lazily, AllCountriesUiState.Loading)
+
+        fun onSearchQueryChanged(query: String) {
+            _searchQuery.value = query
+        }
+
         fun fetchAllCountries() {
             viewModelScope.launch {
                 _allCountriesState.value = AllCountriesUiState.Loading
@@ -78,8 +103,12 @@ class CountryViewModel
                 _singleCountryState.value = SingleCountryUiState.Loading
                 runCatching {
                     countriesRepository.getCountry(name)
-                }.onSuccess { country ->
-                    _singleCountryState.value = SingleCountryUiState.Success(country[0])
+                }.onSuccess { countries ->
+                    if (countries.isNotEmpty()) {
+                        _singleCountryState.value = SingleCountryUiState.Success(countries[0])
+                    } else {
+                        _singleCountryState.value = SingleCountryUiState.NotFound
+                    }
                 }.onFailure { throwable ->
                     if (throwable is ClientRequestException && throwable.response.status.value == 404) {
                         _singleCountryState.value = SingleCountryUiState.NotFound

@@ -37,6 +37,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -70,7 +71,8 @@ fun AllCountries(
     countryViewModel: CountryViewModel = hiltViewModel(),
     navController: NavController? = null,
 ) {
-    val countries = countryViewModel.allCountriesState.collectAsState()
+    val countriesState by countryViewModel.filteredCountriesState.collectAsState()
+    val searchQuery by countryViewModel.searchQuery.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -94,42 +96,53 @@ fun AllCountries(
                 )
             },
         ) { innerPadding ->
-            when (val state = countries.value) {
-                is AllCountriesUiState.Success -> {
-                    val allCountries =
-                        state.countries.mapNotNull { countryItem ->
-                            countryItem.name?.let { name ->
-                                countryItem.flag?.let { flag ->
-                                    Country(name = name, flagUrl = flag)
+            Column(modifier = modifier.padding(innerPadding)) {
+                TextField(
+                    value = searchQuery,
+                    onValueChange = { countryViewModel.onSearchQueryChanged(it) },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    placeholder = { Text("Search for a country") },
+                )
+                when (val state = countriesState) {
+                    is AllCountriesUiState.Success -> {
+                        val allCountries =
+                            state.countries.mapNotNull { countryItem ->
+                                countryItem.name?.let { name ->
+                                    countryItem.flag?.let { flag ->
+                                        Country(name = name, flagUrl = flag)
+                                    }
                                 }
                             }
+
+                        AllCountriesList(
+                            modifier = Modifier,
+                            countries = allCountries,
+                            onCheckedChange = {},
+                            onCountryClicked = { countryName ->
+                                navController?.navigate("countryInfo/$countryName")
+                            },
+                        )
+                    }
+
+                    is AllCountriesUiState.Error -> {
+                        // Show error message to user with retry option
+                        ErrowWhenFetching(modifier, innerPadding, countryViewModel)
+                    }
+
+                    is AllCountriesUiState.Loading -> {
+                        // Show loading indicator
+                        Box(
+                            modifier =
+                                modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
                         }
-
-                    AllCountriesList(
-                        modifier = modifier.padding(innerPadding),
-                        countries = allCountries,
-                        onCheckedChange = {},
-                        onCountryClicked = { countryName ->
-                            navController?.navigate("countryInfo/$countryName")
-                        },
-                    )
-                }
-
-                is AllCountriesUiState.Error -> {
-                    // Show error message to user with retry option
-                    ErrowWhenFetching(modifier, innerPadding, countryViewModel)
-                }
-
-                is AllCountriesUiState.Loading -> {
-                    // Show loading indicator
-                    Box(
-                        modifier =
-                            modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
                     }
                 }
             }
@@ -170,7 +183,7 @@ private fun ErrowWhenFetching(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllCountriesTopAppBar(onMenuClick: () -> Unit = {}) {
+private fun AllCountriesTopAppBar(onMenuClick: () -> Unit = {}) {
     TopAppBar(
         title = {
             Text(
