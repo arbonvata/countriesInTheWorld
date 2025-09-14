@@ -1,6 +1,5 @@
 package com.example.countriesoftheworld.presentation.compose
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,8 +45,6 @@ import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
 import com.example.countriesoftheworld.presentation.viewmodel.SingleCountryUiState
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 
-const val TAG = "CountryInfoScreen"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountryInfoScreen(
@@ -57,17 +53,12 @@ fun CountryInfoScreen(
     countryViewModel: CountryViewModel = hiltViewModel(),
     navController: NavController,
 ) {
-    SideEffect {
-        Log.d(TAG, "Entered CountryInfoScreen for country: $countryName")
-    }
-    val country = countryViewModel.singleCountryState.collectAsState()
+    val countryState by countryViewModel.singleCountryState.collectAsState()
     val scrollState = rememberScrollState()
+
     LaunchedEffect(countryName) {
-        Log.d(TAG, "LaunchedEffect: Fetching country details for $countryName")
-        countryViewModel.clearSingleCountryState()
         countryViewModel.fetchCountryByName(countryName)
     }
-    val countryState = country
 
     Scaffold(
         topBar = {
@@ -86,18 +77,12 @@ fun CountryInfoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            when (countryState.value) {
+            when (val state = countryState) {
                 is SingleCountryUiState.Success -> {
-                    val countryState = countryState.value as SingleCountryUiState.Success
-                    val country = countryState.country
-
-                    CountryDetailsContent(country = country)
+                    CountryDetailsContent(country = state.country)
                 }
 
                 is SingleCountryUiState.Error -> {
-                    val countryState = countryState.value as SingleCountryUiState.Error
-                    Log.e(TAG, "Error fetching country details: ${countryState.message}")
-                    // Show error message to user with retry option
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,12 +102,10 @@ fun CountryInfoScreen(
                 }
 
                 is SingleCountryUiState.Loading -> {
-                    // Show loading indicator
                     CountryInfoLoadingIndicator()
                 }
 
                 SingleCountryUiState.NotFound -> {
-                    Log.d(TAG, "Country not found")
                     Text(
                         text = "Country not found",
                         modifier = Modifier.padding(16.dp),

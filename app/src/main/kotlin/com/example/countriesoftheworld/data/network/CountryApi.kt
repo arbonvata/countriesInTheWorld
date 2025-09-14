@@ -18,15 +18,13 @@ class CountryApi
     constructor(
         private val client: HttpClient,
     ) : CountryApiService {
-        override suspend fun getCountries(): List<CountryItem> = client.get("countries").body<List<CountryItem>>()
+        override suspend fun getCountries(): List<CountryItem> = client.get("countries").body()
 
         override suspend fun getCountry(countryName: String): List<CountryItem> =
             client
                 .get {
                     url {
-                        // The base URL is already set by defaultRequest
-                        // We append path segments here
                         appendPathSegments("name", countryName)
                     }
-                }.body<List<CountryItem>>()
+                }.body()
     }

@@ -9,7 +9,7 @@ data class CountryItem(
     val alpha2Code: String? = null,
     @SerialName("alpha3Code")
     val alpha3Code: String? = null,
-    @SerialName("al?Spellings")
+    @SerialName("altSpellings")
     val altSpellings: List<String>? = null,
     @SerialName("area")
     val area: Double? = null,

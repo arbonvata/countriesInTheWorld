@@ -1,6 +1,5 @@
 package com.example.countriesoftheworld.presentation.compose
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,7 +76,6 @@ fun AllCountries(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        Log.d("ArbonVata", "Fetching all countries")
         countryViewModel.fetchAllCountries()
     }
 
@@ -108,19 +106,10 @@ fun AllCountries(
                 )
                 when (val state = countriesState) {
                     is AllCountriesUiState.Success -> {
-                        val allCountries =
-                            state.countries.mapNotNull { countryItem ->
-                                countryItem.name?.let { name ->
-                                    countryItem.flag?.let { flag ->
-                                        Country(name = name, flagUrl = flag)
-                                    }
-                                }
-                            }
-
+                        val allCountries = state.countries.toCountries()
                         AllCountriesList(
                             modifier = Modifier,
                             countries = allCountries,
-                            onCheckedChange = {},
                             onCountryClicked = { countryName ->
                                 navController?.navigate("countryInfo/$countryName")
                             },
@@ -128,12 +117,10 @@ fun AllCountries(
                     }
 
                     is AllCountriesUiState.Error -> {
-                        // Show error message to user with retry option
                         ErrowWhenFetching(modifier, innerPadding, countryViewModel)
                     }
 
                     is AllCountriesUiState.Loading -> {
-                        // Show loading indicator
                         Box(
                             modifier =
                                 modifier
@@ -149,6 +136,15 @@ fun AllCountries(
         }
     }
 }
+
+private fun List<com.example.countriesoftheworld.data.model.CountryItem>.toCountries(): List<Country> =
+    this.mapNotNull { countryItem ->
+        countryItem.name?.let { name ->
+            countryItem.flag?.let { flag ->
+                Country(name = name, flagUrl = flag)
+            }
+        }
+    }
 
 @Composable
 private fun ErrowWhenFetching(

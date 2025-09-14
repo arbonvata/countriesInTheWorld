@@ -1,11 +1,11 @@
 package com.example.countriesoftheworld
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.countriesoftheworld.navigation.AppNavigation
@@ -20,8 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CountriesOfTheWorldTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Log.d("ArbonVata", innerPadding.toString())
-                    AppNavigation()
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.example.countriesoftheworld.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,10 +13,11 @@ import com.example.countriesoftheworld.presentation.compose.AllCountries
 import com.example.countriesoftheworld.presentation.compose.CountryInfoScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(modifier: Modifier = Modifier) {
     val navController: NavHostController = rememberNavController() // 1. Create NavController
 
     NavHost( // 2. Create NavHost
+        modifier = modifier,
         navController = navController,
         startDestination = AppDestinations.ALL_COUNTRIES_ROUTE, // 3. Define the start destination
     ) {

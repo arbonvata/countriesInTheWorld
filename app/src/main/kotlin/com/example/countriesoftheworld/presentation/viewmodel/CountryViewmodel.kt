@@ -1,6 +1,5 @@
 package com.example.countriesoftheworld.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesoftheworld.data.model.CountryItem
@@ -46,7 +45,6 @@ sealed interface SingleCountryUiState {
 class CountryViewModel
     @Inject
     constructor(
-        // Constructor injection
         private val countriesRepository: AllCountriesRepository,
     ) : ViewModel() {
         private val _allCountriesState =
@@ -83,13 +81,10 @@ class CountryViewModel
             viewModelScope.launch {
                 _allCountriesState.value = AllCountriesUiState.Loading
                 runCatching {
-                    // Use runCatching to get a kotlin.Result
                     countriesRepository.getAllCountries()
                 }.onSuccess { countries ->
-                    Log.d("ArbonVata", "onSuccess: $countries")
                     _allCountriesState.value = AllCountriesUiState.Success(countries = countries)
                 }.onFailure { throwable ->
-                    Log.d("ArbonVata", "onError: ${throwable.message}")
                     _allCountriesState.value =
                         AllCountriesUiState.Error(
                             throwable.message ?: "Failed to load countries",
@@ -104,25 +99,22 @@ class CountryViewModel
                 runCatching {
                     countriesRepository.getCountry(name)
                 }.onSuccess { countries ->
-                    if (countries.isNotEmpty()) {
-                        _singleCountryState.value = SingleCountryUiState.Success(countries[0])
-                    } else {
-                        _singleCountryState.value = SingleCountryUiState.NotFound
-                    }
+                    _singleCountryState.value =
+                        if (countries.isNotEmpty()) {
+                            SingleCountryUiState.Success(countries[0])
+                        } else {
+                            SingleCountryUiState.NotFound
+                        }
                 }.onFailure { throwable ->
-                    if (throwable is ClientRequestException && throwable.response.status.value == 404) {
-                        _singleCountryState.value = SingleCountryUiState.NotFound
-                    } else {
-                        _singleCountryState.value =
+                    _singleCountryState.value =
+                        if (throwable is ClientRequestException && throwable.response.status.value == 404) {
+                            SingleCountryUiState.NotFound
+                        } else {
                             SingleCountryUiState.Error(
                                 throwable.message ?: "Failed to load details for $name",
                             )
-                    }
+                        }
                 }
             }
-        }
-
-        fun clearSingleCountryState() {
-            _singleCountryState.value = SingleCountryUiState.Loading
         }
     }
