@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -74,14 +77,27 @@ fun AllCountries(
     val searchQuery by countryViewModel.searchQuery.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    // 2. Add state to track the current selected route for the drawer
+    var currentRoute by remember { mutableStateOf(AppRoutes.ALL_COUNTRIES) }
 
     LaunchedEffect(Unit) {
         countryViewModel.fetchAllCountries()
     }
 
+    // 3. Pass new parameters to the Navigation Drawer
     AllCountriesNavigationDrawer(
         drawerState = drawerState,
         scope = scope,
+        currentRoute = currentRoute,
+        onNavigate = { route ->
+            currentRoute = route // Update the selected item
+            // Here you can add logic to filter the list based on the route, e.g.:
+            // countryViewModel.setFilter(route)
+            // Or navigate to a different screen if you have separate composables for each
+            scope.launch {
+                drawerState.close()
+            }
+        },
     ) {
         Scaffold(
             topBar = {
@@ -204,6 +220,9 @@ private fun AllCountriesTopAppBar(onMenuClick: () -> Unit = {}) {
 fun AllCountriesNavigationDrawer(
     drawerState: DrawerState,
     scope: CoroutineScope,
+    // 4. Accept currentRoute and a navigation callback
+    currentRoute: String,
+    onNavigate: (String) -> Unit,
     content: @Composable () -> Unit,
 ) {
     ModalNavigationDrawer(
@@ -216,48 +235,38 @@ fun AllCountriesNavigationDrawer(
                     modifier = Modifier.padding(16.dp),
                 )
                 HorizontalDivider()
-                // Navigation item with rectangular shape and full width
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // 5. Update NavigationDrawerItems to be dynamic
                 NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Public, contentDescription = "All Countries") },
                     label = { Text("All Countries") },
-                    selected = true,
-                    onClick = {
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraSmall, // Use a minimal shape instead of rounded
-                    colors = NavigationDrawerItemDefaults.colors(), // Keep the same colors
+                    selected = currentRoute == AppRoutes.ALL_COUNTRIES,
+                    onClick = { onNavigate(AppRoutes.ALL_COUNTRIES) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
-                Spacer(modifier = Modifier.height(3.dp))
                 NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Visited by me") },
                     label = { Text("Visited by me") },
-                    selected = true,
-                    onClick = {
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    // modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraSmall, // Use a minimal shape instead of rounded
-                    colors = NavigationDrawerItemDefaults.colors(), // Keep the same colors
+                    selected = currentRoute == AppRoutes.VISITED_COUNTRIES,
+                    onClick = { onNavigate(AppRoutes.VISITED_COUNTRIES) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
-                Spacer(modifier = Modifier.height(3.dp))
                 NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.HighlightOff, contentDescription = "Not visited by me") },
                     label = { Text("Not visited by me") },
-                    selected = true,
-                    onClick = {
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    // modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraSmall, // Use a minimal shape instead of rounded
-                    colors = NavigationDrawerItemDefaults.colors(), // Keep the same colors
+                    selected = currentRoute == AppRoutes.NOT_VISITED_COUNTRIES,
+                    onClick = { onNavigate(AppRoutes.NOT_VISITED_COUNTRIES) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
-                // Add more navigation items here as needed
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Public, contentDescription = "List of continents") },
+                    label = { Text("Continents") },
+                    selected = currentRoute == AppRoutes.CONTINENTS,
+                    onClick = { onNavigate(AppRoutes.CONTINENTS) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                )
             }
         },
     ) {
