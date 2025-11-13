@@ -117,4 +117,9 @@ class CountryViewModel
                 }
             }
         }
+
+        fun saveCountryToDatabase(country: com.example.countriesoftheworld.data.model.Country) {
+            // Empty method to be implemented later when database is set up
+            // This method will save the selected country to the database
+        }
     }

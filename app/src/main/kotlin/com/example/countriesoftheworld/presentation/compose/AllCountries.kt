@@ -129,6 +129,9 @@ fun AllCountries(
                             onCountryClicked = { countryName ->
                                 navController?.navigate("countryInfo/$countryName")
                             },
+                            onSaveCountry = { country ->
+                                countryViewModel.saveCountryToDatabase(country)
+                            },
                         )
                     }
 
@@ -280,6 +283,7 @@ private fun AllCountriesList(
     countries: List<Country>,
     onCheckedChange: (Boolean) -> Unit = {},
     onCountryClicked: (String) -> Unit,
+    onSaveCountry: (Country) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier,
@@ -293,6 +297,7 @@ private fun AllCountriesList(
                 modifier = Modifier.padding(8.dp),
                 onCheckedChange = onCheckedChange,
                 onCountryClicked = onCountryClicked,
+                onSaveCountry = onSaveCountry,
             )
         }
     }
@@ -304,6 +309,7 @@ fun CountryWithFlag(
     country: Country,
     onCheckedChange: (Boolean) -> Unit = {},
     onCountryClicked: (country: String) -> Unit,
+    onSaveCountry: (Country) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
@@ -333,6 +339,7 @@ fun CountryWithFlag(
         Spacer(modifier = Modifier.weight(1f))
         // Add the three-dot icon
         CountryOptionsMenu(
+            country = country,
             expanded = expanded,
             checked = checked,
             onExpandedChange = { expanded = it },
@@ -340,16 +347,19 @@ fun CountryWithFlag(
                 checked = newState
                 onCheckedChange(checked)
             },
+            onSaveCountry = onSaveCountry,
         )
     }
 }
 
 @Composable
 fun CountryOptionsMenu(
+    country: Country,
     expanded: Boolean,
     checked: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onCheckedChange: (Boolean) -> Unit,
+    onSaveCountry: (Country) -> Unit,
 ) {
     Box {
         IconButton(onClick = { onExpandedChange(true) }) {
@@ -370,6 +380,9 @@ fun CountryOptionsMenu(
                             checked = checked,
                             onCheckedChange = { newState ->
                                 onCheckedChange(newState)
+                                if (newState) {
+                                    onSaveCountry(country)
+                                }
                                 onExpandedChange(false) // Close menu after selection
                             },
                             modifier = Modifier.padding(end = 8.dp),

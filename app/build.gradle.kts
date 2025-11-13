@@ -1,4 +1,5 @@
 plugins {
+
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt)
     id("org.jlleitschuh.gradle.ktlint")
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("io.objectbox")
 }
 
 android {
@@ -88,6 +90,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(platform(libs.androidx.compose.bom))
 }
 
 detekt {
