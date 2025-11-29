@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesoftheworld.data.model.CountryItem
 import com.example.countriesoftheworld.data.repository.AllCountriesRepository
+import com.example.countriesoftheworld.presentation.compose.Continent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,11 +78,11 @@ class CountryViewModel
             _searchQuery.value = query
         }
 
-        fun fetchAllCountries() {
+        fun fetchAllCountries(continent: Continent? = null) {
             viewModelScope.launch {
                 _allCountriesState.value = AllCountriesUiState.Loading
                 runCatching {
-                    countriesRepository.getAllCountries()
+                    countriesRepository.getAllCountries(continent)
                 }.onSuccess { countries ->
                     _allCountriesState.value = AllCountriesUiState.Success(countries = countries)
                 }.onFailure { throwable ->

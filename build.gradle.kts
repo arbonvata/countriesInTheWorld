@@ -1,15 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    val objectboxVersion = "5.0.1" // For Groovy build scripts
-    // val objectboxVersion by extra("5.0.1") // For Kotlin DSL scripts
-
     repositories {
         mavenCentral()
     }
 
     dependencies {
         classpath(libs.gradle) // Android Gradle Plugin 8.0+
-        classpath("io.objectbox:objectbox-gradle-plugin:$objectboxVersion")
+        classpath(libs.objectbox.gradle.plugin)
     }
 }
 

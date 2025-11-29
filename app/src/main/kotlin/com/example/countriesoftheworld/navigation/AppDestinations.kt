@@ -1,11 +1,17 @@
 package com.example.countriesoftheworld.navigation
 
 object AppDestinations {
-    const val ALL_COUNTRIES_ROUTE = "allCountries"
-    const val COUNTRY_INFO_ROUTE_BASE = "countryInfo" // Base for routes with arguments
-    const val COUNTRY_INFO_ARG_NAME = "countryName"
-    const val COUNTRY_INFO_ROUTE_WITH_ARG = "$COUNTRY_INFO_ROUTE_BASE/{$COUNTRY_INFO_ARG_NAME}"
+    const val ALL_COUNTRIES_ARG = "continentName"
+    const val ALL_COUNTRIES_BASE_ROUTE = "all_countries"
+    const val ALL_COUNTRIES_ROUTE = "all_countries?continentName={$ALL_COUNTRIES_ARG}"
 
-    // Helper to create the route for navigation
-    fun countryInfoRoute(countryName: String) = "$COUNTRY_INFO_ROUTE_BASE/$countryName"
+    const val CONTINENTS_ROUTE = "continents"
+
+    const val COUNTRY_INFO_ARG_NAME = "countryName"
+    const val COUNTRY_INFO_ROUTE = "countryInfo"
+    const val COUNTRY_INFO_ROUTE_WITH_ARG = "$COUNTRY_INFO_ROUTE/{$COUNTRY_INFO_ARG_NAME}"
+
+    fun allCountriesRoute(continentName: String): String = "all_countries?continentName=$continentName"
+
+    fun countryInfoRoute(countryName: String): String = "$COUNTRY_INFO_ROUTE/$countryName"
 }

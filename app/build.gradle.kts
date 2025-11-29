@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.hilt)
     id("org.jlleitschuh.gradle.ktlint")
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
-    id("io.objectbox")
 }
 
 android {
@@ -79,9 +78,12 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    val objectboxVersion = "5.0.1"
 
     // Optional - for ViewModel injection
     implementation(libs.hilt.navigation.compose) // If using Jetpack Compose Navigation
+    debugImplementation(libs.objectbox.android.objectbrowser)
+    releaseImplementation(libs.objectbox.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -92,6 +94,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(platform(libs.androidx.compose.bom))
 }
+
+apply(plugin = "io.objectbox")
 
 detekt {
     // Other Detekt configurations

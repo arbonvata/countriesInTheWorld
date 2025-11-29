@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCountries(
+    continent: Continent? = null,
     modifier: Modifier = Modifier,
     countryViewModel: CountryViewModel = hiltViewModel(),
     navController: NavController? = null,
@@ -80,8 +81,11 @@ fun AllCountries(
     // 2. Add state to track the current selected route for the drawer
     var currentRoute by remember { mutableStateOf(AppRoutes.ALL_COUNTRIES) }
 
-    LaunchedEffect(Unit) {
-        countryViewModel.fetchAllCountries()
+    // Use a key to force refresh when navigating back to all countries
+    var refreshKey by remember { mutableStateOf(0) }
+
+    LaunchedEffect(continent?.name ?: refreshKey) {
+        countryViewModel.fetchAllCountries(continent)
     }
 
     // 3. Pass new parameters to the Navigation Drawer
@@ -91,9 +95,29 @@ fun AllCountries(
         currentRoute = currentRoute,
         onNavigate = { route ->
             currentRoute = route // Update the selected item
-            // Here you can add logic to filter the list based on the route, e.g.:
-            // countryViewModel.setFilter(route)
-            // Or navigate to a different screen if you have separate composables for each
+            // Navigate to different screens based on the route
+            when (route) {
+                AppRoutes.CONTINENTS -> {
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.CONTINENTS_ROUTE)
+                }
+                AppRoutes.ALL_COUNTRIES -> {
+                    refreshKey++ // Increment to trigger refresh
+                    // Navigate to all countries without continent filter
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE) {
+                        // Clear the back stack to avoid multiple instances
+                        popUpTo(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+                AppRoutes.VISITED_COUNTRIES -> {
+                    // TODO: Implement visited countries filtering or separate screen
+                }
+                AppRoutes.NOT_VISITED_COUNTRIES -> {
+                    // TODO: Implement not visited countries filtering or separate screen
+                }
+            }
             scope.launch {
                 drawerState.close()
             }
