@@ -126,6 +126,7 @@ fun AllCountries(
         Scaffold(
             topBar = {
                 AllCountriesTopAppBar(
+                    title = continent?.name ?: "All Countries",
                     onMenuClick = {
                         scope.launch {
                             drawerState.open()
@@ -160,7 +161,7 @@ fun AllCountries(
                     }
 
                     is AllCountriesUiState.Error -> {
-                        ErrowWhenFetching(modifier, innerPadding, countryViewModel)
+                        ErrowWhenFetching(modifier, innerPadding, countryViewModel, continent)
                     }
 
                     is AllCountriesUiState.Loading -> {
@@ -194,6 +195,7 @@ private fun ErrowWhenFetching(
     modifier: Modifier,
     innerPadding: PaddingValues,
     countryViewModel: CountryViewModel,
+    continent: Continent? = null,
 ) {
     Box(
         modifier =
@@ -212,7 +214,7 @@ private fun ErrowWhenFetching(
                 textAlign = TextAlign.Center,
             )
             Button(
-                onClick = { countryViewModel.fetchAllCountries() },
+                onClick = { countryViewModel.fetchAllCountries(continent) },
             ) {
                 Text("Retry")
             }
@@ -222,11 +224,14 @@ private fun ErrowWhenFetching(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AllCountriesTopAppBar(onMenuClick: () -> Unit = {}) {
+private fun AllCountriesTopAppBar(
+    title: String,
+    onMenuClick: () -> Unit = {},
+) {
     TopAppBar(
         title = {
             Text(
-                text = "All Countries",
+                text = title,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )

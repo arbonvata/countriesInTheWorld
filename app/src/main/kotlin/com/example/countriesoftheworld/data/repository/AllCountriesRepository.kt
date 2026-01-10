@@ -16,9 +16,20 @@ class AllCountriesRepository
             if (continent == null) {
                 countryApi.getCountries()
             } else {
-                countryApi.getCountries().filter {
-                    Log.d("AllCountriesRepository", "Filtering by continent: ${continent.name} and region: ${it.region}")
-                    it.region == continent.name
+                countryApi.getCountries().filter { country ->
+                    Log.d("AllCountriesRepository", "Filtering by continent: ${continent.name}, country region: ${country.region}, subregion: ${country.subregion}")
+                    
+                    val continentName = continent.name
+                    val region = country.region
+                    val subregion = country.subregion
+
+                    when (continentName) {
+                        "North America" -> region == "Americas" && subregion != "South America"
+                        "South America" -> region == "Americas" && subregion == "South America"
+                        "Australia (Oceania)" -> region == "Oceania"
+                        "Antarctica" -> region == "Polar" || country.name?.contains("Antarctica", ignoreCase = true) == true
+                        else -> region == continentName
+                    }
                 }
             }
 
