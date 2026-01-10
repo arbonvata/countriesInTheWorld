@@ -147,15 +147,14 @@ fun AllCountries(
                 )
                 when (val state = countriesState) {
                     is AllCountriesUiState.Success -> {
-                        val allCountries = state.countries.toCountries()
                         AllCountriesList(
                             modifier = Modifier,
-                            countries = allCountries,
+                            countries = state.countries,
                             onCountryClicked = { countryName ->
                                 navController?.navigate("countryInfo/$countryName")
                             },
-                            onSaveCountry = { country ->
-                                countryViewModel.saveCountryToDatabase(country)
+                            onToggleVisited = { country, isVisited ->
+                                countryViewModel.toggleCountryVisited(country, isVisited)
                             },
                         )
                     }
@@ -180,15 +179,6 @@ fun AllCountries(
         }
     }
 }
-
-private fun List<com.example.countriesoftheworld.data.model.CountryItem>.toCountries(): List<Country> =
-    this.mapNotNull { countryItem ->
-        countryItem.name?.let { name ->
-            countryItem.flag?.let { flag ->
-                Country(name = name, flagUrl = flag)
-            }
-        }
-    }
 
 @Composable
 private fun ErrowWhenFetching(
@@ -310,23 +300,20 @@ fun AllCountriesNavigationDrawer(
 private fun AllCountriesList(
     modifier: Modifier,
     countries: List<Country>,
-    onCheckedChange: (Boolean) -> Unit = {},
     onCountryClicked: (String) -> Unit,
-    onSaveCountry: (Country) -> Unit = {},
+    onToggleVisited: (Country, Boolean) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        items(items = countries) { country ->
-
+        items(items = countries, key = { it.name }) { country ->
             CountryWithFlag(
                 country = country,
                 modifier = Modifier.padding(8.dp),
-                onCheckedChange = onCheckedChange,
                 onCountryClicked = onCountryClicked,
-                onSaveCountry = onSaveCountry,
+                onToggleVisited = onToggleVisited,
             )
         }
     }
@@ -336,12 +323,10 @@ private fun AllCountriesList(
 fun CountryWithFlag(
     modifier: Modifier,
     country: Country,
-    onCheckedChange: (Boolean) -> Unit = {},
     onCountryClicked: (country: String) -> Unit,
-    onSaveCountry: (Country) -> Unit = {},
+    onToggleVisited: (Country, Boolean) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var checked by remember { mutableStateOf(false) }
 
     Row(
         modifier =
@@ -370,13 +355,8 @@ fun CountryWithFlag(
         CountryOptionsMenu(
             country = country,
             expanded = expanded,
-            checked = checked,
             onExpandedChange = { expanded = it },
-            onCheckedChange = { newState ->
-                checked = newState
-                onCheckedChange(checked)
-            },
-            onSaveCountry = onSaveCountry,
+            onToggleVisited = onToggleVisited,
         )
     }
 }
@@ -385,10 +365,8 @@ fun CountryWithFlag(
 fun CountryOptionsMenu(
     country: Country,
     expanded: Boolean,
-    checked: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    onCheckedChange: (Boolean) -> Unit,
-    onSaveCountry: (Country) -> Unit,
+    onToggleVisited: (Country, Boolean) -> Unit,
 ) {
     Box {
         IconButton(onClick = { onExpandedChange(true) }) {
@@ -406,20 +384,20 @@ fun CountryOptionsMenu(
                 text = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
-                            checked = checked,
+                            checked = country.isVisited,
                             onCheckedChange = { newState ->
-                                onCheckedChange(newState)
-                                if (newState) {
-                                    onSaveCountry(country)
-                                }
+                                onToggleVisited(country, newState)
                                 onExpandedChange(false) // Close menu after selection
                             },
                             modifier = Modifier.padding(end = 8.dp),
                         )
-                        Text(text = "Select Country")
+                        Text(text = "Is visited by me")
                     }
                 },
-                onClick = { /* Handled by Checkbox */ },
+                onClick = { 
+                    onToggleVisited(country, !country.isVisited)
+                    onExpandedChange(false)
+                },
             )
         }
     }
@@ -438,6 +416,7 @@ fun CountryWithFlagPreview() {
             modifier = Modifier.padding(8.dp),
             onCountryClicked = {
             },
+            onToggleVisited = { _, _ -> },
         )
     }
 }
@@ -472,8 +451,8 @@ fun AllCountriesPreview() {
         AllCountriesList(
             modifier = Modifier,
             countries = sampleCountries,
-            onCheckedChange = {},
             onCountryClicked = {},
+            onToggleVisited = { _, _ -> },
         )
     }
 }

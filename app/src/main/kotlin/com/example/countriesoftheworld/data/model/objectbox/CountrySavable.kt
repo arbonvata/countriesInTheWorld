@@ -7,5 +7,5 @@ import io.objectbox.annotation.Id
 data class CountrySavable(
     @Id var id: Long = 0,
     var name: String? = null,
-    var age: Int = 0,
+    var visitedByMe: Boolean = false,
 )

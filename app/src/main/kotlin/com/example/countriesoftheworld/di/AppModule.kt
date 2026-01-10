@@ -1,5 +1,7 @@
 package com.example.countriesoftheworld.di
 
+import com.example.countriesoftheworld.data.model.objectbox.CountrySavable
+import com.example.countriesoftheworld.data.model.objectbox.ObjectBox
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +15,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import io.objectbox.Box
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
@@ -41,4 +44,8 @@ object AppModule {
                 url("https://www.apicountries.com/")
             }
         }
+
+    @Provides
+    @Singleton
+    fun provideCountryBox(): Box<CountrySavable> = ObjectBox.store.boxFor(CountrySavable::class.java)
 }
