@@ -60,6 +60,9 @@ class CountryViewModel
         private val _searchQuery = MutableStateFlow("")
         val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+        private val _visitedFilter = MutableStateFlow<Boolean?>(null)
+        val visitedFilter: StateFlow<Boolean?> = _visitedFilter.asStateFlow()
+
         private val _singleCountryState =
             MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
         val singleCountryState: StateFlow<SingleCountryUiState> = _singleCountryState.asStateFlow()
@@ -77,10 +80,26 @@ class CountryViewModel
                         }
                         else -> state
                     }
+                }
+                .combine(visitedFilter) { state, visited ->
+                    when (state) {
+                        is AllCountriesUiState.Success -> {
+                            val filteredCountries =
+                                state.countries.filter {
+                                    visited == null || it.isVisited == visited
+                                }
+                            AllCountriesUiState.Success(filteredCountries)
+                        }
+                        else -> state
+                    }
                 }.stateIn(viewModelScope, SharingStarted.Lazily, AllCountriesUiState.Loading)
 
         fun onSearchQueryChanged(query: String) {
             _searchQuery.value = query
+        }
+
+        fun setVisitedFilter(filter: Boolean?) {
+            _visitedFilter.value = filter
         }
 
         fun fetchAllCountries(continent: Continent? = null) {

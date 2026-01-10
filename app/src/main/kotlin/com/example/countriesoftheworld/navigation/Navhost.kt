@@ -52,6 +52,24 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
 
+        // Route for visited countries
+        composable(route = AppDestinations.VISITED_COUNTRIES_ROUTE) {
+            AllCountries(
+                navController = navController,
+                continent = null,
+                visitedFilter = true,
+            )
+        }
+
+        // Route for not visited countries
+        composable(route = AppDestinations.NOT_VISITED_COUNTRIES_ROUTE) {
+            AllCountries(
+                navController = navController,
+                continent = null,
+                visitedFilter = false,
+            )
+        }
+
         composable(route = AppDestinations.CONTINENTS_ROUTE) {
             ContinentsScreen(
                 onContinentClick = { continent ->

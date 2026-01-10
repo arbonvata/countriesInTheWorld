@@ -5,6 +5,9 @@ object AppDestinations {
     const val ALL_COUNTRIES_BASE_ROUTE = "all_countries"
     const val ALL_COUNTRIES_ROUTE = "all_countries?continentName={$ALL_COUNTRIES_ARG}"
 
+    const val VISITED_COUNTRIES_ROUTE = "visited_countries"
+    const val NOT_VISITED_COUNTRIES_ROUTE = "not_visited_countries"
+
     const val CONTINENTS_ROUTE = "continents"
 
     const val COUNTRY_INFO_ARG_NAME = "countryName"

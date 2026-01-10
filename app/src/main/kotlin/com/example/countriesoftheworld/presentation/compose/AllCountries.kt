@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCountries(
+    visitedFilter: Boolean? = null,
     continent: Continent? = null,
     modifier: Modifier = Modifier,
     countryViewModel: CountryViewModel = hiltViewModel(),
@@ -84,9 +85,21 @@ fun AllCountries(
     // Use a key to force refresh when navigating back to all countries
     var refreshKey by remember { mutableStateOf(0) }
 
+    // Set the visited filter when it changes
+    LaunchedEffect(visitedFilter) {
+        countryViewModel.setVisitedFilter(visitedFilter)
+    }
+
     LaunchedEffect(continent?.name ?: refreshKey) {
         countryViewModel.fetchAllCountries(continent)
     }
+
+    // Determine the title based on the filter
+    val screenTitle = when (visitedFilter) {
+        true -> "Visited Countries"
+        false -> "Not Visited Countries"
+        null -> continent?.name ?: "All Countries"
+ }
 
     // 3. Pass new parameters to the Navigation Drawer
     AllCountriesNavigationDrawer(
@@ -112,10 +125,16 @@ fun AllCountries(
                     }
                 }
                 AppRoutes.VISITED_COUNTRIES -> {
-                    // TODO: Implement visited countries filtering or separate screen
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.VISITED_COUNTRIES_ROUTE) {
+                        popUpTo(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE)
+                        launchSingleTop = true
+                    }
                 }
                 AppRoutes.NOT_VISITED_COUNTRIES -> {
-                    // TODO: Implement not visited countries filtering or separate screen
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.NOT_VISITED_COUNTRIES_ROUTE) {
+                        popUpTo(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE)
+                        launchSingleTop = true
+                    }
                 }
             }
             scope.launch {
@@ -126,7 +145,7 @@ fun AllCountries(
         Scaffold(
             topBar = {
                 AllCountriesTopAppBar(
-                    title = continent?.name ?: "All Countries",
+                    title = screenTitle,
                     onMenuClick = {
                         scope.launch {
                             drawerState.open()
