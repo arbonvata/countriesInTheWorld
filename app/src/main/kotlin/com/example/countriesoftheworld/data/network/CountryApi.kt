@@ -11,6 +11,8 @@ interface CountryApiService {
     suspend fun getCountries(): List<CountryItem>
 
     suspend fun getCountry(countryName: String): List<CountryItem>
+
+    suspend fun getCountriesByLanguage(languageCode: String): List<CountryItem>
 }
 
 class CountryApi
@@ -25,6 +27,14 @@ class CountryApi
                 .get {
                     url {
                         appendPathSegments("name", countryName)
+                    }
+                }.body()
+
+        override suspend fun getCountriesByLanguage(languageCode: String): List<CountryItem> =
+            client
+                .get {
+                    url {
+                        appendPathSegments("lang", languageCode)
                     }
                 }.body()
     }

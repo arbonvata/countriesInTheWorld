@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -95,11 +96,12 @@ fun AllCountries(
     }
 
     // Determine the title based on the filter
-    val screenTitle = when (visitedFilter) {
-        true -> "Visited Countries"
-        false -> "Not Visited Countries"
-        null -> continent?.name ?: "All Countries"
- }
+    val screenTitle =
+        when (visitedFilter) {
+            true -> "Visited Countries"
+            false -> "Not Visited Countries"
+            null -> continent?.name ?: "All Countries"
+        }
 
     // 3. Pass new parameters to the Navigation Drawer
     AllCountriesNavigationDrawer(
@@ -112,6 +114,13 @@ fun AllCountries(
             when (route) {
                 AppRoutes.CONTINENTS -> {
                     navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.CONTINENTS_ROUTE)
+                }
+
+                AppRoutes.ALL_LANGUAGES -> {
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.ALL_LANGUAGES_ROUTE) {
+                        popUpTo(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE)
+                        launchSingleTop = true
+                    }
                 }
                 AppRoutes.ALL_COUNTRIES -> {
                     refreshKey++ // Increment to trigger refresh
@@ -141,62 +150,63 @@ fun AllCountries(
                 drawerState.close()
             }
         },
-    ) {
-        Scaffold(
-            topBar = {
-                AllCountriesTopAppBar(
-                    title = screenTitle,
-                    onMenuClick = {
-                        scope.launch {
-                            drawerState.open()
+        content = {
+            Scaffold(
+                topBar = {
+                    AllCountriesTopAppBar(
+                        title = screenTitle,
+                        onMenuClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        },
+                    )
+                },
+            ) { innerPadding ->
+                Column(modifier = modifier.padding(innerPadding)) {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { countryViewModel.onSearchQueryChanged(it) },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                        placeholder = { Text("Search for a country") },
+                    )
+                    when (val state = countriesState) {
+                        is AllCountriesUiState.Success -> {
+                            AllCountriesList(
+                                modifier = Modifier,
+                                countries = state.countries,
+                                onCountryClicked = { countryName ->
+                                    navController?.navigate("countryInfo/$countryName")
+                                },
+                                onToggleVisited = { country, isVisited ->
+                                    countryViewModel.toggleCountryVisited(country, isVisited)
+                                },
+                            )
                         }
-                    },
-                )
-            },
-        ) { innerPadding ->
-            Column(modifier = modifier.padding(innerPadding)) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { countryViewModel.onSearchQueryChanged(it) },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    placeholder = { Text("Search for a country") },
-                )
-                when (val state = countriesState) {
-                    is AllCountriesUiState.Success -> {
-                        AllCountriesList(
-                            modifier = Modifier,
-                            countries = state.countries,
-                            onCountryClicked = { countryName ->
-                                navController?.navigate("countryInfo/$countryName")
-                            },
-                            onToggleVisited = { country, isVisited ->
-                                countryViewModel.toggleCountryVisited(country, isVisited)
-                            },
-                        )
-                    }
 
-                    is AllCountriesUiState.Error -> {
-                        ErrowWhenFetching(modifier, innerPadding, countryViewModel, continent)
-                    }
+                        is AllCountriesUiState.Error -> {
+                            ErrowWhenFetching(modifier, innerPadding, countryViewModel, continent)
+                        }
 
-                    is AllCountriesUiState.Loading -> {
-                        Box(
-                            modifier =
-                                modifier
-                                    .fillMaxSize()
-                                    .padding(innerPadding),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator()
+                        is AllCountriesUiState.Loading -> {
+                            Box(
+                                modifier =
+                                    modifier
+                                        .fillMaxSize()
+                                        .padding(innerPadding),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
                 }
             }
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -298,6 +308,14 @@ fun AllCountriesNavigationDrawer(
                     label = { Text("Not visited by me") },
                     selected = currentRoute == AppRoutes.NOT_VISITED_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.NOT_VISITED_COUNTRIES) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                )
+
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Translate, contentDescription = "All Languages") },
+                    label = { Text("All Languages") },
+                    selected = currentRoute == AppRoutes.ALL_LANGUAGES,
+                    onClick = { onNavigate(AppRoutes.ALL_LANGUAGES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
 
@@ -413,7 +431,7 @@ fun CountryOptionsMenu(
                         Text(text = "Is visited by me")
                     }
                 },
-                onClick = { 
+                onClick = {
                     onToggleVisited(country, !country.isVisited)
                     onExpandedChange(false)
                 },

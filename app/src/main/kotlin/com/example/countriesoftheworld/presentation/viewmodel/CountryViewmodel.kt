@@ -80,8 +80,7 @@ class CountryViewModel
                         }
                         else -> state
                     }
-                }
-                .combine(visitedFilter) { state, visited ->
+                }.combine(visitedFilter) { state, visited ->
                     when (state) {
                         is AllCountriesUiState.Success -> {
                             val filteredCountries =
@@ -107,7 +106,7 @@ class CountryViewModel
                 _allCountriesState.value = AllCountriesUiState.Loading
                 runCatching {
                     val countryItems = countriesRepository.getAllCountries(continent)
-                    
+
                     // Fetch all visited names from the database once
                     val query = countryBox.query(CountrySavable_.visitedByMe.equal(true)).build()
                     val visitedNames = query.find().mapNotNull { it.name }.toSet()
@@ -118,7 +117,7 @@ class CountryViewModel
                             Country(
                                 name = name,
                                 flagUrl = item.flag ?: "",
-                                isVisited = visitedNames.contains(name)
+                                isVisited = visitedNames.contains(name),
                             )
                         }
                     }
@@ -158,11 +157,14 @@ class CountryViewModel
             }
         }
 
-        fun toggleCountryVisited(country: Country, isVisited: Boolean) {
+        fun toggleCountryVisited(
+            country: Country,
+            isVisited: Boolean,
+        ) {
             viewModelScope.launch {
                 val query = countryBox.query(CountrySavable_.name.equal(country.name)).build()
                 val existing = query.findFirst()
-                
+
                 if (existing != null) {
                     existing.visitedByMe = isVisited
                     countryBox.put(existing)
@@ -170,15 +172,16 @@ class CountryViewModel
                     countryBox.put(CountrySavable(name = country.name, visitedByMe = isVisited))
                 }
                 query.close()
-                
-                // Update the state locally to avoid a full refresh if possible, 
+
+                // Update the state locally to avoid a full refresh if possible,
                 // but for now, re-fetching or updating the current list is simpler.
                 // To be reactive, we could use ObjectBox Flow/LiveData, but let's just update the state here.
                 val currentState = _allCountriesState.value
                 if (currentState is AllCountriesUiState.Success) {
-                    val updatedList = currentState.countries.map {
-                        if (it.name == country.name) it.copy(isVisited = isVisited) else it
-                    }
+                    val updatedList =
+                        currentState.countries.map {
+                            if (it.name == country.name) it.copy(isVisited = isVisited) else it
+                        }
                     _allCountriesState.value = AllCountriesUiState.Success(updatedList)
                 }
             }

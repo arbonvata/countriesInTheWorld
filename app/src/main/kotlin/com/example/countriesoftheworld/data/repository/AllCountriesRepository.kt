@@ -17,8 +17,11 @@ class AllCountriesRepository
                 countryApi.getCountries()
             } else {
                 countryApi.getCountries().filter { country ->
-                    Log.d("AllCountriesRepository", "Filtering by continent: ${continent.name}, country region: ${country.region}, subregion: ${country.subregion}")
-                    
+                    Log.d(
+                        "AllCountriesRepository",
+                        "Filtering by continent: ${continent.name}, country region: ${country.region}, subregion: ${country.subregion}",
+                    )
+
                     val continentName = continent.name
                     val region = country.region
                     val subregion = country.subregion
@@ -34,4 +37,6 @@ class AllCountriesRepository
             }
 
         suspend fun getCountry(name: String) = countryApi.getCountry(name)
+
+        suspend fun getCountriesByLanguage(languageCode: String) = countryApi.getCountriesByLanguage(languageCode)
     }

@@ -24,17 +24,20 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideHttpClient(): HttpClient =
+    fun provideJson(): Json =
+        Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+            explicitNulls = false
+        }
+
+    @Provides
+    @Singleton
+    fun provideHttpClient(json: Json): HttpClient =
         HttpClient(CIO) {
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        prettyPrint = true
-                        isLenient = true
-                        ignoreUnknownKeys = true
-                        explicitNulls = false
-                    },
-                )
+                json(json)
             }
             install(Logging) {
                 logger = Logger.DEFAULT

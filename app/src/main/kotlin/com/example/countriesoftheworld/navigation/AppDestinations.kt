@@ -14,7 +14,14 @@ object AppDestinations {
     const val COUNTRY_INFO_ROUTE = "countryInfo"
     const val COUNTRY_INFO_ROUTE_WITH_ARG = "$COUNTRY_INFO_ROUTE/{$COUNTRY_INFO_ARG_NAME}"
 
+    const val ALL_LANGUAGES_ROUTE = "all_languages"
+
+    const val COUNTRIES_BY_LANGUAGE_ARG = "languageCode"
+    const val COUNTRIES_BY_LANGUAGE_ROUTE = "countries_by_language/{$COUNTRIES_BY_LANGUAGE_ARG}"
+
     fun allCountriesRoute(continentName: String): String = "all_countries?continentName=$continentName"
 
     fun countryInfoRoute(countryName: String): String = "$COUNTRY_INFO_ROUTE/$countryName"
+
+    fun countriesByLanguageRoute(languageCode: String): String = "countries_by_language/$languageCode"
 }

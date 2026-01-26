@@ -10,8 +10,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.countriesoftheworld.presentation.compose.AllCountries
+import com.example.countriesoftheworld.presentation.compose.AllLanguagesScreen
 import com.example.countriesoftheworld.presentation.compose.Continent
 import com.example.countriesoftheworld.presentation.compose.ContinentsScreen
+import com.example.countriesoftheworld.presentation.compose.CountriesByLanguageScreen
 import com.example.countriesoftheworld.presentation.compose.CountryInfoScreen
 
 @Composable
@@ -27,8 +29,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         // Base route for all countries without continent filter
         composable(route = AppDestinations.ALL_COUNTRIES_BASE_ROUTE) {
             AllCountries(
-                navController = navController,
                 continent = null, // No continent filter for base route
+                navController = navController,
             )
         }
 
@@ -46,27 +48,26 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             // Retrieve the optional continent name
             val continentName = backStackEntry.arguments?.getString(AppDestinations.ALL_COUNTRIES_ARG)
             AllCountries(
-                navController = navController,
-                // Pass the continent only if continentName is not null/empty
                 continent = if (continentName.isNullOrEmpty()) null else Continent(continentName, "", ""),
+                navController = navController,
             )
         }
 
         // Route for visited countries
         composable(route = AppDestinations.VISITED_COUNTRIES_ROUTE) {
             AllCountries(
-                navController = navController,
                 continent = null,
                 visitedFilter = true,
+                navController = navController,
             )
         }
 
         // Route for not visited countries
         composable(route = AppDestinations.NOT_VISITED_COUNTRIES_ROUTE) {
             AllCountries(
-                navController = navController,
                 continent = null,
                 visitedFilter = false,
+                navController = navController,
             )
         }
 
@@ -79,6 +80,41 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 onBackClick = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        // Route for all languages
+        composable(route = AppDestinations.ALL_LANGUAGES_ROUTE) {
+            AllLanguagesScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onLanguageClick = { languageCode ->
+                    navController.navigate(AppDestinations.countriesByLanguageRoute(languageCode))
+                },
+            )
+        }
+
+        // Route for countries by language
+        composable(
+            route = AppDestinations.COUNTRIES_BY_LANGUAGE_ROUTE,
+            arguments =
+                listOf(
+                    navArgument(AppDestinations.COUNTRIES_BY_LANGUAGE_ARG) {
+                        type = NavType.StringType
+                    },
+                ),
+        ) { backStackEntry ->
+            val languageCode = backStackEntry.arguments?.getString(AppDestinations.COUNTRIES_BY_LANGUAGE_ARG) ?: return@composable
+            CountriesByLanguageScreen(
+                languageCode = languageCode,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCountryClick = { countryName ->
+                    navController.navigate(AppDestinations.countryInfoRoute(countryName))
+                },
+                languageName = "",
             )
         }
 
