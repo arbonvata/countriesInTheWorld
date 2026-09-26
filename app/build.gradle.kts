@@ -1,23 +1,23 @@
 plugins {
 
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    // alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("com.android.legacy-kapt")
     id("org.jlleitschuh.gradle.ktlint")
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 android {
     namespace = "com.example.countriesoftheworld"
-    compileSdk = 36
-
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.example.countriesoftheworld"
         minSdk = 34
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    val objectboxVersion = "5.0.1"
 
     // Optional - for ViewModel injection
     implementation(libs.hilt.navigation.compose) // If using Jetpack Compose Navigation

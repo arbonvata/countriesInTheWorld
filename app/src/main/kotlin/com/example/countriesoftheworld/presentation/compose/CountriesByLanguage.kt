@@ -37,6 +37,7 @@ import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.data.model.CountryItem
 import com.example.countriesoftheworld.data.model.Flags
 import com.example.countriesoftheworld.data.model.Language
+import com.example.countriesoftheworld.data.model.flagImageUrl
 import com.example.countriesoftheworld.presentation.viewmodel.CountriesByLanguageViewModel
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 
@@ -169,7 +170,7 @@ fun CountryCardForLanguage(
     ) {
         Column {
             AsyncImage(
-                model = country.flags?.png ?: country.flag,
+                model = country.flagImageUrl(),
                 contentDescription = "Flag of ${country.name}",
                 modifier =
                     Modifier

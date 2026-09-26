@@ -3,6 +3,17 @@ package com.example.countriesoftheworld.data.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Wikimedia thumbnail URLs returned by the API are rejected for some files
+ * (e.g. Afghanistan's flag 403s), so prefer a stable URL built from the country code.
+ */
+fun CountryItem.flagImageUrl(): String =
+    alpha2Code
+        ?.takeIf { it.length == 2 && it.all { ch -> ch.isLetter() } }
+        ?.let { "https://flagcdn.com/w320/${it.lowercase()}.png" }
+        ?: flags?.png
+        ?: ""
+
 @Serializable
 data class CountryItem(
     @SerialName("alpha2Code")

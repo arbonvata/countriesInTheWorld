@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesoftheworld.data.model.Country
 import com.example.countriesoftheworld.data.model.CountryItem
+import com.example.countriesoftheworld.data.model.flagImageUrl
 import com.example.countriesoftheworld.data.model.objectbox.CountrySavable
 import com.example.countriesoftheworld.data.model.objectbox.CountrySavable_
 import com.example.countriesoftheworld.data.repository.AllCountriesRepository
@@ -116,7 +117,7 @@ class CountryViewModel
                         item.name?.let { name ->
                             Country(
                                 name = name,
-                                flagUrl = item.flag ?: "",
+                                flagUrl = item.flagImageUrl(),
                                 isVisited = visitedNames.contains(name),
                             )
                         }

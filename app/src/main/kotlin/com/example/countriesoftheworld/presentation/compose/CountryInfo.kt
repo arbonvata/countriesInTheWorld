@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.countriesoftheworld.data.model.CountryItem
+import com.example.countriesoftheworld.data.model.flagImageUrl
 import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
 import com.example.countriesoftheworld.presentation.viewmodel.SingleCountryUiState
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
@@ -222,7 +223,7 @@ private fun CountryDetailsContent(country: CountryItem) {
     // Flag
     TextWithFlag(
         countryName = country.name ?: "Unknown",
-        flagUrl = country.flag ?: "",
+        flagUrl = country.flagImageUrl(),
     )
 }
 

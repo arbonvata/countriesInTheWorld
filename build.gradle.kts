@@ -20,6 +20,7 @@ buildscript {
 
         alias(libs.plugins.ksp) apply false
         alias(libs.plugins.hilt) apply false
+        id("com.android.legacy-kapt") version "9.4.1" apply false
 
 
     }
