@@ -18,6 +18,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.objectbox.Box
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
+import com.example.countriesoftheworld.data.model.objectbox.LanguageCountrySavable
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -51,4 +52,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCountryBox(): Box<CountrySavable> = ObjectBox.store.boxFor(CountrySavable::class.java)
+
+    @Provides
+    @Singleton
+    fun provideLanguageCountryBox(): Box<LanguageCountrySavable> = ObjectBox.store.boxFor(LanguageCountrySavable::class.java)
 }

@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.countriesoftheworld.R
 import com.example.countriesoftheworld.data.model.LanguageData
 import com.example.countriesoftheworld.presentation.viewmodel.LanguageViewModel
 import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
@@ -85,7 +87,7 @@ fun AllLanguagesContent(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                placeholder = { Text("Search for a language") },
+                placeholder = { Text(stringResource(R.string.search_for_a_language)) },
             )
             LazyColumn(
                 modifier = Modifier.weight(1f),

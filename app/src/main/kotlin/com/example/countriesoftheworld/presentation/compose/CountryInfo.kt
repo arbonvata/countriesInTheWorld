@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.countriesoftheworld.R
 import com.example.countriesoftheworld.data.model.CountryItem
 import com.example.countriesoftheworld.data.model.flagImageUrl
 import com.example.countriesoftheworld.presentation.viewmodel.CountryViewModel
@@ -309,7 +311,7 @@ fun CountryVisitedByMe(
 
         Text(
             modifier = Modifier.weight(1f),
-            text = "Visited by me",
+            text = stringResource(R.string.visited_by_me),
             style = MaterialTheme.typography.bodyMedium,
         )
     }

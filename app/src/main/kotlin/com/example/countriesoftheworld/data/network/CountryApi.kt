@@ -4,6 +4,7 @@ import com.example.countriesoftheworld.data.model.CountryItem
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.http.isSuccess
 import io.ktor.http.appendPathSegments
 import javax.inject.Inject
 
@@ -30,11 +31,16 @@ class CountryApi
                     }
                 }.body()
 
-        override suspend fun getCountriesByLanguage(languageCode: String): List<CountryItem> =
-            client
-                .get {
+        // The API returns 404 with a plain-text body ("Language not found") for
+        // language codes it has no data for, e.g. Akan; map that to an empty list
+        // instead of letting body() throw a serialization error.
+        override suspend fun getCountriesByLanguage(languageCode: String): List<CountryItem> {
+            val response =
+                client.get {
                     url {
                         appendPathSegments("lang", languageCode)
                     }
-                }.body()
+                }
+            return if (response.status.isSuccess()) response.body() else emptyList()
+        }
     }
