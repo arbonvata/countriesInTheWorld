@@ -45,7 +45,9 @@ object AppModule {
                 level = LogLevel.HEADERS
             }
             defaultRequest {
-                url("https://www.apicountries.com/")
+                //url("https://www.apicountries.com/")
+                //new url
+                url("https://countries.dev/")
             }
         }
 
