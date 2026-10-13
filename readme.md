@@ -1,5 +1,9 @@
 # readme.md
 
+## ⚠️ Hobby Project Disclaimer
+
+**This is a hobby project.** It is written for learning and personal enjoyment, and it does **not** meet the high standards used in professional/industry software development. Expect shortcuts, incomplete features, missing tests, and code that prioritizes experimentation over rigor. Do not use this codebase as a reference for production-quality Android development.
+
 ## Project Overview
 
 This is an Android Kotlin app called "Countries of the World" that displays a list of countries with their flags and allows navigation to detailed country information. The app uses Jetpack Compose for UI, Ktor for networking, and follows MVVM architecture pattern.
