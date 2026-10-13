@@ -64,6 +64,9 @@ class CountryViewModel
         private val _visitedFilter = MutableStateFlow<Boolean?>(null)
         val visitedFilter: StateFlow<Boolean?> = _visitedFilter.asStateFlow()
 
+        private val _favouriteFilter = MutableStateFlow(false)
+        val favouriteFilter: StateFlow<Boolean> = _favouriteFilter.asStateFlow()
+
         private val _singleCountryState =
             MutableStateFlow<SingleCountryUiState>(SingleCountryUiState.Loading)
         val singleCountryState: StateFlow<SingleCountryUiState> = _singleCountryState.asStateFlow()
@@ -92,6 +95,17 @@ class CountryViewModel
                         }
                         else -> state
                     }
+                }.combine(favouriteFilter) { state, favourite ->
+                    when (state) {
+                        is AllCountriesUiState.Success -> {
+                            val filteredCountries =
+                                state.countries.filter {
+                                    !favourite || it.isFavourite
+                                }
+                            AllCountriesUiState.Success(filteredCountries)
+                        }
+                        else -> state
+                    }
                 }.stateIn(viewModelScope, SharingStarted.Lazily, AllCountriesUiState.Loading)
 
         fun onSearchQueryChanged(query: String) {
@@ -102,16 +116,24 @@ class CountryViewModel
             _visitedFilter.value = filter
         }
 
+        fun setFavouriteFilter(filter: Boolean) {
+            _favouriteFilter.value = filter
+        }
+
         fun fetchAllCountries(continent: Continent? = null) {
             viewModelScope.launch {
                 _allCountriesState.value = AllCountriesUiState.Loading
                 runCatching {
                     val countryItems = countriesRepository.getAllCountries(continent)
 
-                    // Fetch all visited names from the database once
-                    val query = countryBox.query(CountrySavable_.visitedByMe.equal(true)).build()
-                    val visitedNames = query.find().mapNotNull { it.name }.toSet()
-                    query.close()
+                    // Fetch all visited and favourite names from the database once
+                    val visitedQuery = countryBox.query(CountrySavable_.visitedByMe.equal(true)).build()
+                    val visitedNames = visitedQuery.find().mapNotNull { it.name }.toSet()
+                    visitedQuery.close()
+
+                    val favouriteQuery = countryBox.query(CountrySavable_.favourite.equal(true)).build()
+                    val favouriteNames = favouriteQuery.find().mapNotNull { it.name }.toSet()
+                    favouriteQuery.close()
 
                     countryItems.mapNotNull { item ->
                         item.name?.let { name ->
@@ -119,6 +141,7 @@ class CountryViewModel
                                 name = name,
                                 flagUrl = item.flagImageUrl(),
                                 isVisited = visitedNames.contains(name),
+                                isFavourite = favouriteNames.contains(name),
                             )
                         }
                     }
@@ -187,6 +210,38 @@ class CountryViewModel
                 }
             }
         }
+
+    fun toggleCountryFavourite(country: Country,
+                               isFavourite: Boolean) {
+        viewModelScope.launch {
+            val query = countryBox.query(CountrySavable_.name.equal(country.name)).build()
+            val existing = query.findFirst()
+
+            if (existing != null) {
+                existing.favourite = isFavourite
+                countryBox.put(existing)
+            } else {
+                countryBox.put(CountrySavable(name = country.name, favourite = isFavourite))
+            }
+            query.close()
+
+            // Update the state locally to avoid a full refresh if possible,
+            // but for now, re-fetching or updating the current list is simpler.
+            // To be reactive, we could use ObjectBox Flow/LiveData, but let's just update the state here.
+            val currentState = _allCountriesState.value
+            if (currentState is AllCountriesUiState.Success) {
+                val updatedList =
+                    currentState.countries.map {
+                        if (it.name == country.name) it.copy(isFavourite = isFavourite) else it
+                    }
+                _allCountriesState.value = AllCountriesUiState.Success(updatedList)
+            }
+        }
+    }
+
+
+
+
 
         fun isCountryVisited(countryName: String): Boolean {
             val query = countryBox.query(CountrySavable_.name.equal(countryName)).build()

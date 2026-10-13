@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "3:1414156174019061326",
-      "lastPropertyId": "4:982027343408889674",
+      "lastPropertyId": "5:1125973996011691401",
       "name": "CountrySavable",
       "properties": [
         {
@@ -22,6 +22,11 @@
         {
           "id": "4:982027343408889674",
           "name": "visitedByMe",
+          "type": 1
+        },
+        {
+          "id": "5:1125973996011691401",
+          "name": "favourite",
           "type": 1
         }
       ],

@@ -9,6 +9,8 @@
     <string name="all_countries">All Countries</string>
     <string name="is_visited_by_me">Is visited by me</string>
     <string name="mark_as_favourite">Marks as favourite</string>
+    <string name="favourite_countries">Favourite countries</string>"
     <string name="error_loading_country_details_please_check_your_connection_and_try_again">Error loading country details. Please check your connection and try again.</string>
     <string name="retry">Retry</string>
+    <string name="continents">Continents</string>
 </resources>

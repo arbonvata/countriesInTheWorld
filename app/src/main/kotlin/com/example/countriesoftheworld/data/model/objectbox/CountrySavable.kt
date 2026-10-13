@@ -8,4 +8,5 @@ data class CountrySavable(
     @Id var id: Long = 0,
     var name: String? = null,
     var visitedByMe: Boolean = false,
+    var favourite: Boolean = false,
 )

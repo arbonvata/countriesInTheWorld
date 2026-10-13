@@ -4,4 +4,5 @@ data class Country(
     val name: String,
     val flagUrl: String,
     val isVisited: Boolean = false,
+    val isFavourite: Boolean = false,
 )

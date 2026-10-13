@@ -71,6 +71,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
 
+        // Route for favourite countries
+        composable(route = AppDestinations.FAVOURITE_COUNTRIES_ROUTE) {
+            AllCountries(
+                continent = null,
+                favouriteFilter = true,
+                navController = navController,
+            )
+        }
+
         composable(route = AppDestinations.CONTINENTS_ROUTE) {
             ContinentsScreen(
                 onContinentClick = { continent ->

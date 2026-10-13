@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -72,6 +73,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AllCountries(
     visitedFilter: Boolean? = null,
+    favouriteFilter: Boolean = false,
     continent: Continent? = null,
     modifier: Modifier = Modifier,
     countryViewModel: CountryViewModel = hiltViewModel(),
@@ -92,16 +94,25 @@ fun AllCountries(
         countryViewModel.setVisitedFilter(visitedFilter)
     }
 
+    // Set the favourite filter when it changes
+    LaunchedEffect(favouriteFilter) {
+        countryViewModel.setFavouriteFilter(favouriteFilter)
+    }
+
     LaunchedEffect(continent?.name ?: refreshKey) {
         countryViewModel.fetchAllCountries(continent)
     }
 
     // Determine the title based on the filter
     val screenTitle =
-        when (visitedFilter) {
-            true -> "Visited Countries"
-            false -> "Not Visited Countries"
-            null -> continent?.name ?: "All Countries"
+        when {
+            favouriteFilter -> stringResource(R.string.favourite_countries)
+            else ->
+                when (visitedFilter) {
+                    true -> "Visited Countries"
+                    false -> "Not Visited Countries"
+                    null -> continent?.name ?: "All Countries"
+                }
         }
 
     // 3. Pass new parameters to the Navigation Drawer
@@ -146,6 +157,12 @@ fun AllCountries(
                         launchSingleTop = true
                     }
                 }
+                AppRoutes.FAVOURITE_COUNTRIES -> {
+                    navController?.navigate(com.example.countriesoftheworld.navigation.AppDestinations.FAVOURITE_COUNTRIES_ROUTE) {
+                        popUpTo(com.example.countriesoftheworld.navigation.AppDestinations.ALL_COUNTRIES_BASE_ROUTE)
+                        launchSingleTop = true
+                    }
+                }
             }
             scope.launch {
                 drawerState.close()
@@ -184,6 +201,10 @@ fun AllCountries(
                                 },
                                 onToggleVisited = { country, isVisited ->
                                     countryViewModel.toggleCountryVisited(country, isVisited)
+                                },
+                                onToggleFavourite = {country, isFavourite ->
+                                    countryViewModel.toggleCountryFavourite(country, isFavourite)
+
                                 },
                             )
                         }
@@ -298,22 +319,31 @@ fun AllCountriesNavigationDrawer(
                 )
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.visited_by_me)) },
-                    label = { Text("Visited by me") },
+                    label = { Text(stringResource(R.string.visited_by_me)) },
                     selected = currentRoute == AppRoutes.VISITED_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.VISITED_COUNTRIES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.HighlightOff, contentDescription = stringResource(R.string.not_visited_by_me)) },
-                    label = { Text("Not visited by me") },
+                    label = { Text(stringResource(R.string.not_visited_by_me)) },
                     selected = currentRoute == AppRoutes.NOT_VISITED_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.NOT_VISITED_COUNTRIES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
 
                 NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.Favorite, contentDescription = stringResource(R.string.favourite_countries)) },
+                    label = { Text(stringResource(R.string.favourite_countries)) },
+                    selected = currentRoute == AppRoutes.FAVOURITE_COUNTRIES,
+                    onClick = { onNavigate(AppRoutes.FAVOURITE_COUNTRIES) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+
+                )
+
+                NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Translate, contentDescription = stringResource(R.string.all_languages)) },
-                    label = { Text("All Languages") },
+                    label = { Text(stringResource(R.string.all_languages)) },
                     selected = currentRoute == AppRoutes.ALL_LANGUAGES,
                     onClick = { onNavigate(AppRoutes.ALL_LANGUAGES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
@@ -321,7 +351,7 @@ fun AllCountriesNavigationDrawer(
 
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Default.Public, contentDescription = stringResource(R.string.list_of_continents)) },
-                    label = { Text("Continents") },
+                    label = { Text(stringResource(R.string.continents)) },
                     selected = currentRoute == AppRoutes.CONTINENTS,
                     onClick = { onNavigate(AppRoutes.CONTINENTS) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
@@ -339,6 +369,7 @@ private fun AllCountriesList(
     countries: List<Country>,
     onCountryClicked: (String) -> Unit,
     onToggleVisited: (Country, Boolean) -> Unit,
+    onToggleFavourite: (Country, Boolean) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -351,6 +382,7 @@ private fun AllCountriesList(
                 modifier = Modifier.padding(8.dp),
                 onCountryClicked = onCountryClicked,
                 onToggleVisited = onToggleVisited,
+                onToggleFavourite = onToggleFavourite,
             )
         }
     }
@@ -362,6 +394,7 @@ fun CountryWithFlag(
     country: Country,
     onCountryClicked: (country: String) -> Unit,
     onToggleVisited: (Country, Boolean) -> Unit,
+    onToggleFavourite: (Country, Boolean) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -394,6 +427,7 @@ fun CountryWithFlag(
             expanded = expanded,
             onExpandedChange = { expanded = it },
             onToggleVisited = onToggleVisited,
+            onToggleFavourite = onToggleFavourite,
         )
     }
 }
@@ -404,6 +438,7 @@ fun CountryOptionsMenu(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onToggleVisited: (Country, Boolean) -> Unit,
+    onToggleFavourite: (Country, Boolean) -> Unit
 ) {
     Box {
         IconButton(onClick = { onExpandedChange(true) }) {
@@ -436,6 +471,26 @@ fun CountryOptionsMenu(
                     onExpandedChange(false)
                 },
             )
+
+            DropdownMenuItem(
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = country.isFavourite,
+                            onCheckedChange = { newState ->
+                                onToggleFavourite(country, newState)
+                                onExpandedChange(false) // Close menu after selection
+                            },
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                        Text(text = stringResource(R.string.mark_as_favourite))
+                    }
+                },
+                onClick = {
+                    onToggleFavourite(country, !country.isFavourite)
+                    onExpandedChange(false)
+                },
+            )
         }
     }
 }
@@ -453,7 +508,12 @@ fun CountryWithFlagPreview() {
             modifier = Modifier.padding(8.dp),
             onCountryClicked = {
             },
-            onToggleVisited = { _, _ -> },
+            onToggleVisited = {_,_ ->
+
+            },
+            onToggleFavourite = {_,_ ->
+
+            },
         )
     }
 }
@@ -490,6 +550,7 @@ fun AllCountriesPreview() {
             countries = sampleCountries,
             onCountryClicked = {},
             onToggleVisited = { _, _ -> },
+            onToggleFavourite = { _, _ -> },
         )
     }
 }

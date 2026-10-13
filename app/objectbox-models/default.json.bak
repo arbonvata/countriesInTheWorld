@@ -29,7 +29,7 @@
     },
     {
       "id": "4:2671939288207537476",
-      "lastPropertyId": "4:1716382127017639050",
+      "lastPropertyId": "5:2470814711516914495",
       "name": "LanguageCountrySavable",
       "properties": [
         {
@@ -51,6 +51,11 @@
         {
           "id": "4:1716382127017639050",
           "name": "countryName",
+          "type": 9
+        },
+        {
+          "id": "5:2470814711516914495",
+          "name": "countryCode",
           "type": 9
         }
       ],
