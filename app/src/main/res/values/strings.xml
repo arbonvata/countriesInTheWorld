@@ -3,4 +3,12 @@
     <string name="search_for_a_country">Search for a country</string>
     <string name="search_for_a_language">Search for a language</string>
     <string name="visited_by_me">Visited by me</string>
+    <string name="not_visited_by_me">Not visited by me</string>
+    <string name="all_languages">All Languages</string>
+    <string name="list_of_continents">List of continents</string>
+    <string name="all_countries">All Countries</string>
+    <string name="is_visited_by_me">Is visited by me</string>
+    <string name="mark_as_favourite">Marks as favourite</string>
+    <string name="error_loading_country_details_please_check_your_connection_and_try_again">Error loading country details. Please check your connection and try again.</string>
+    <string name="retry">Retry</string>
 </resources>

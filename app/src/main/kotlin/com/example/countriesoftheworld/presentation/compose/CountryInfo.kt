@@ -91,7 +91,7 @@ fun CountryInfoScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = "Error loading country details. Please check your connection and try again.",
+                            text = stringResource(R.string.error_loading_country_details_please_check_your_connection_and_try_again),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(bottom = 16.dp),
                             textAlign = TextAlign.Center,
@@ -99,7 +99,7 @@ fun CountryInfoScreen(
                         Button(
                             onClick = { countryViewModel.fetchCountryByName(countryName) },
                         ) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }

@@ -69,7 +69,6 @@ import com.example.countriesoftheworld.ui.theme.CountriesOfTheWorldTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCountries(
     visitedFilter: Boolean? = null,
@@ -229,7 +228,7 @@ private fun ErrowWhenFetching(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Error loading countries. Please check your connection and try again.",
+                text = stringResource(R.string.error_loading_country_details_please_check_your_connection_and_try_again),
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(bottom = 16.dp),
                 textAlign = TextAlign.Center,
@@ -268,7 +267,6 @@ private fun AllCountriesTopAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCountriesNavigationDrawer(
     drawerState: DrawerState,
@@ -292,21 +290,21 @@ fun AllCountriesNavigationDrawer(
 
                 // 5. Update NavigationDrawerItems to be dynamic
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Public, contentDescription = "All Countries") },
+                    icon = { Icon(Icons.Default.Public, contentDescription = stringResource(R.string.all_countries)) },
                     label = { Text("All Countries") },
                     selected = currentRoute == AppRoutes.ALL_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.ALL_COUNTRIES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Visited by me") },
+                    icon = { Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.visited_by_me)) },
                     label = { Text("Visited by me") },
                     selected = currentRoute == AppRoutes.VISITED_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.VISITED_COUNTRIES) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 )
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.HighlightOff, contentDescription = "Not visited by me") },
+                    icon = { Icon(Icons.Default.HighlightOff, contentDescription = stringResource(R.string.not_visited_by_me)) },
                     label = { Text("Not visited by me") },
                     selected = currentRoute == AppRoutes.NOT_VISITED_COUNTRIES,
                     onClick = { onNavigate(AppRoutes.NOT_VISITED_COUNTRIES) },
@@ -314,7 +312,7 @@ fun AllCountriesNavigationDrawer(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Translate, contentDescription = "All Languages") },
+                    icon = { Icon(Icons.Default.Translate, contentDescription = stringResource(R.string.all_languages)) },
                     label = { Text("All Languages") },
                     selected = currentRoute == AppRoutes.ALL_LANGUAGES,
                     onClick = { onNavigate(AppRoutes.ALL_LANGUAGES) },
@@ -322,7 +320,7 @@ fun AllCountriesNavigationDrawer(
                 )
 
                 NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Public, contentDescription = "List of continents") },
+                    icon = { Icon(Icons.Default.Public, contentDescription = stringResource(R.string.list_of_continents)) },
                     label = { Text("Continents") },
                     selected = currentRoute == AppRoutes.CONTINENTS,
                     onClick = { onNavigate(AppRoutes.CONTINENTS) },
@@ -430,7 +428,7 @@ fun CountryOptionsMenu(
                             },
                             modifier = Modifier.padding(end = 8.dp),
                         )
-                        Text(text = "Is visited by me")
+                        Text(text = stringResource(R.string.is_visited_by_me))
                     }
                 },
                 onClick = {
