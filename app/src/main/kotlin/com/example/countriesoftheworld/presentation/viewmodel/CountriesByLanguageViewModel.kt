@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 data class CountriesByLanguageUiState(
     val countries: List<CountryItem> = emptyList(),
@@ -48,6 +49,7 @@ class CountriesByLanguageViewModel
                             error = null,
                         )
                 } catch (e: Exception) {
+                    if (e is CancellationException) throw e
                     _uiState.value =
                         _uiState.value.copy(
                             countries = emptyList(),
